@@ -1,5 +1,6 @@
 import {
   index,
+  pgSequence,
   pgTable,
   text,
   timestamp,
@@ -9,6 +10,8 @@ import {
 import { citizenStatus } from "./enums";
 import { users } from "./users";
 
+// DH-000001 dipakai SUPER_ADMIN dari seed, jadi mulai dari 2
+export const citizenCodeSeq = pgSequence("citizen_code_seq", { startWith: 2 });
 export const citizens = pgTable(
   "citizens",
   {
