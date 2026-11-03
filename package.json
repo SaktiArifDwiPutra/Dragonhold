@@ -1,0 +1,12 @@
+{
+  "name": "dragonhold",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "db:generate": "pnpm --filter @dragonhold/db db:generate",
+    "db:migrate": "pnpm --filter @dragonhold/db db:migrate",
+    "db:seed": "pnpm --filter @dragonhold/db db:seed"
+  }
+}
