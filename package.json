@@ -7,6 +7,8 @@
     "typecheck": "pnpm -r typecheck",
     "db:generate": "pnpm --filter @dragonhold/db db:generate",
     "db:migrate": "pnpm --filter @dragonhold/db db:migrate",
-    "db:seed": "pnpm --filter @dragonhold/db db:seed"
+    "db:seed": "pnpm --filter @dragonhold/db db:seed",
+    "dev:api": "pnpm --filter @dragonhold/api dev",
+    "dev:web": "pnpm --filter @dragonhold/web dev"
   }
 }
