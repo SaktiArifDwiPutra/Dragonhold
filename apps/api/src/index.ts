@@ -8,6 +8,7 @@ const { db } = createDb(env.DATABASE_URL);
 const app = createApp(db, {
   webOrigins: env.WEB_ORIGIN.split(",").map((s) => s.trim()),
   isProd: env.NODE_ENV === "production",
+  trustedProxyHops: env.TRUSTED_PROXY_HOPS,
 });
 
 serve({ fetch: app.fetch, port: env.API_PORT }, (info) => {
