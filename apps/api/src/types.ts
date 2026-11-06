@@ -3,6 +3,7 @@ import type { Database } from "@dragonhold/db";
 export type AppConfig = {
   webOrigins: string[];
   isProd: boolean;
+  trustedProxyHops: number;
 };
 
 export type AuthContext = {
