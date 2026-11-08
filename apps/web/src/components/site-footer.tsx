@@ -4,7 +4,7 @@ import { Emblem } from "./emblem";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t-2 border-navy-700 bg-navy-900">
+    <footer className="border-t-2 border-navy-700 bg-navy-900 pb-20 sm:pb-0">
       <div className="mx-auto grid max-w-5xl gap-10 px-4 py-12 sm:grid-cols-3">
         <div>
           <div className="flex items-center gap-3">

@@ -21,8 +21,10 @@ export function Field({ label, error, hint, className, ...input }: FieldProps) {
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         className={cx(
-          "w-full border-2 bg-navy-950 px-3 py-2 text-parchment-50 placeholder:text-stone-500",
-          error ? "border-burgundy-500" : "border-navy-700 focus:border-gold-500",
+          "w-full min-h-[46px] border-2 bg-navy-950 px-3.5 py-2.5 text-base sm:text-sm text-parchment-50 placeholder:text-stone-500 transition-colors focus:outline-none",
+          error
+            ? "border-burgundy-500 focus:ring-2 focus:ring-burgundy-500/40"
+            : "border-navy-700 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30",
           className,
         )}
         {...input}

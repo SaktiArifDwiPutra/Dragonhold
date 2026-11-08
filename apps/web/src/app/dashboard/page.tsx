@@ -48,10 +48,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Citizen Details */}
-      <Panel variant="parchment" className="mt-6">
-        <div className="border-b border-parchment-300 pb-3">
-          <span className="inline-block rounded border border-gold-600 bg-gold-50 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-gold-800">
-            {me.user.role}
+      <Panel variant="parchment" brackets className="mt-6">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-parchment-300 pb-3">
+          <span className="inline-block rounded border border-gold-600 bg-gold-50 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-gold-800">
+            🛡️ {me.user.role}
+          </span>
+          <span className="text-xs font-display uppercase tracking-widest text-stone-500">
+            Aetherial Citizen Pass
           </span>
         </div>
         <dl className="mt-4 space-y-3 text-sm">
@@ -59,9 +62,11 @@ export default function DashboardPage() {
             <dt className="text-stone-600">Character name</dt>
             <dd className="font-semibold text-stone-900">{me.citizen?.characterName ?? "—"}</dd>
           </div>
-          <div className="flex justify-between gap-4 border-b border-parchment-300 pb-2">
+          <div className="flex items-center justify-between gap-4 border-b border-parchment-300 pb-2">
             <dt className="text-stone-600">Citizen ID</dt>
-            <dd className="font-mono font-semibold text-stone-900">{me.citizen?.citizenCode ?? "—"}</dd>
+            <dd className="rounded border border-gold-600/40 bg-gold-500/10 px-2 py-0.5 font-mono font-bold text-amber-900">
+              {me.citizen?.citizenCode ?? "—"}
+            </dd>
           </div>
           <div className="flex justify-between gap-4 border-b border-parchment-300 pb-2">
             <dt className="text-stone-600">Username</dt>
@@ -78,21 +83,21 @@ export default function DashboardPage() {
 
       {/* Realm Status */}
       <div className="mt-8">
-        <h2 className="text-xl">Realm Overview</h2>
+        <h2 className="text-xl font-display uppercase tracking-wider text-gold-400">Realm Overview</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Panel>
+          <Panel brackets variant="hud">
             <h3 className="text-base font-semibold text-gold-300">Kingdom of Dragonhold</h3>
             <p className="mt-2 text-sm text-stone-300">
-              Status: <span className="font-semibold text-parchment-100">Newly Established</span>
+              Status: <span className="font-semibold text-emerald-400">Newly Established</span>
             </p>
             <p className="mt-1 text-xs text-stone-400">
               The throne remains vacant. Humanity is rebuilding in the aftermath of the dragon war.
             </p>
           </Panel>
-          <Panel>
+          <Panel brackets variant="hud">
             <h3 className="text-base font-semibold text-gold-300">Chronicles of the Realm</h3>
             <p className="mt-2 text-sm text-stone-300">
-              Upcoming: <span className="font-semibold text-parchment-100">Episode 001</span>
+              Upcoming: <span className="font-semibold text-amber-300">Episode 001</span>
             </p>
             <p className="mt-1 text-xs text-stone-400">
               Governance, voting, and chronicle records will activate as the kingdom unfolds.

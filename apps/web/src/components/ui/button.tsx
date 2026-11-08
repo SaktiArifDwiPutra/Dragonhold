@@ -10,15 +10,15 @@ export function buttonStyles({
   size = "md",
 }: { variant?: Variant; size?: Size } = {}) {
   return cx(
-    "inline-flex items-center justify-center gap-2 font-display tracking-wide select-none",
-    "border-2 transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50",
-    size === "md" ? "px-4 py-2 text-sm" : "px-6 py-3 text-base",
+    "inline-flex items-center justify-center gap-2 font-display uppercase tracking-wider select-none min-h-[44px] transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50",
+    "border-2",
+    size === "md" ? "px-4 py-2 text-xs sm:text-sm font-semibold" : "px-6 py-3 text-sm sm:text-base font-bold",
     variant === "primary" &&
-      "border-gold-600 bg-gold-500 text-navy-950 hover:bg-gold-400",
+      "border-gold-300 bg-gradient-to-b from-gold-400 via-gold-500 to-gold-600 text-navy-950 font-bold shadow-[0_3px_0_0_#92400e] hover:brightness-105 active:translate-y-0.5 active:shadow-none",
     variant === "secondary" &&
-      "border-gold-600/70 bg-transparent text-gold-300 hover:bg-gold-500/10",
+      "border-gold-600/70 bg-navy-900/90 text-gold-300 shadow-[0_2px_0_0_#0f172a] hover:bg-gold-500/10 hover:border-gold-400 active:translate-y-0.5 active:shadow-none",
     variant === "ghost" &&
-      "border-transparent bg-transparent text-parchment-200 hover:text-gold-300",
+      "border-transparent bg-transparent text-parchment-200 hover:text-gold-300 hover:bg-white/5",
   );
 }
 
