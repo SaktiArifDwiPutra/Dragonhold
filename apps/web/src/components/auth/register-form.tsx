@@ -16,6 +16,7 @@ type Values = {
   email: string;
   password: string;
   confirmPassword: string;
+  betaCode: string;
 };
 type FieldErrors = Partial<Record<keyof Values, string>>;
 
@@ -27,6 +28,7 @@ export function RegisterForm() {
     email: "",
     password: "",
     confirmPassword: "",
+    betaCode: "",
   });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -107,6 +109,15 @@ export function RegisterForm() {
         value={values.confirmPassword}
         onChange={update("confirmPassword")}
         error={errors.confirmPassword}
+      />
+      <Field
+        label="Beta Access Code"
+        name="betaCode"
+        autoComplete="off"
+        value={values.betaCode}
+        onChange={update("betaCode")}
+        error={errors.betaCode}
+        hint="Required during closed beta. Enter the access code provided for early registration."
       />
       <Button type="submit" disabled={submitting} className="w-full">
         {submitting ? "Registering…" : "Become a Citizen"}

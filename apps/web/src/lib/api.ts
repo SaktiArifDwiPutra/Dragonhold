@@ -22,8 +22,13 @@ type RequestOptions = Omit<RequestInit, "body"> & { json?: unknown };
 
 export async function api<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { json, headers, ...rest } = options;
-  const res = await fetch(`/api${path}`, {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL
+    ? process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "")
+    : "/api";
+
+  const res = await fetch(`${baseUrl}${path}`, {
     ...rest,
+    credentials: "include",
     headers: {
       ...(json !== undefined ? { "Content-Type": "application/json" } : {}),
       ...headers,
@@ -54,6 +59,9 @@ const MESSAGES: Record<string, string> = {
   RATE_LIMITED: "Too many attempts. Please wait a few minutes and try again.",
   ACCOUNT_SUSPENDED: "This account has been suspended.",
   VALIDATION_ERROR: "Please check the highlighted fields.",
+  INVALID_BETA_CODE: "Closed beta access code is incorrect.",
+  REGISTRATION_UNAVAILABLE: "Closed beta registration is currently closed.",
+  BAD_ORIGIN: "Request rejected: unauthorized origin.",
 };
 
 export function errorText(err: unknown): string {
