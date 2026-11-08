@@ -1,6 +1,7 @@
-import { getConnInfo } from "@hono/node-server/conninfo";
 import { createMiddleware } from "hono/factory";
+import { getClientIp } from "../lib/client-ip";
 import { HttpError } from "../lib/errors";
+import type { AppEnv } from "../types";
 
 // In-memory: cukup untuk satu instance. Kalau nanti multi-instance, pindah ke Redis/DB.
 export function rateLimit(opts: { windowMs: number; max: number }) {
@@ -13,16 +14,8 @@ export function rateLimit(opts: { windowMs: number; max: number }) {
     }
   }, opts.windowMs).unref();
 
-  return createMiddleware(async (c, next) => {
-    let remote: string | undefined;
-    try {
-      remote = getConnInfo(c).remote.address;
-    } catch {
-      remote = undefined;
-    }
-    // API ini hanya boleh diakses lewat Next.js (rewrite), jangan di-expose langsung ke internet
-    const forwarded = c.req.header("x-forwarded-for")?.split(",")[0]?.trim();
-    const key = forwarded || remote || "unknown";
+  return createMiddleware<AppEnv>(async (c, next) => {
+    const key = getClientIp(c, c.get("config").trustedProxyHops);
 
     const now = Date.now();
     const entry = hits.get(key);
