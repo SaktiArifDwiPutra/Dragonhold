@@ -39,7 +39,32 @@ function Section({
   );
 }
 
-export default function HomePage() {
+type Announcement = {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  publishedAt: string | null;
+  createdAt: string;
+};
+
+async function getAnnouncements(): Promise<Announcement[]> {
+  try {
+    const apiUrl = process.env.API_URL ?? "http://localhost:4000";
+    const res = await fetch(`${apiUrl}/announcements`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.announcements ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const announcements = await getAnnouncements();
+
   return (
     <>
       {/* 1. Hero */}
@@ -199,14 +224,40 @@ export default function HomePage() {
       </Section>
 
       {/* 6. Latest announcements */}
-      {/* TODO (Phase 3): ambil dari GET /announcements */}
       <Section id="announcements" eyebrow="Proclamations" title="Latest Announcements">
-        <Panel className="text-stone-300">
-          <p>No proclamations yet.</p>
-          <p className="mt-1 text-sm text-stone-400">
-            When the Creator or the crown speaks, it will be written here.
-          </p>
-        </Panel>
+        {announcements.length > 0 ? (
+          <div className="space-y-4">
+            {announcements.map((item) => (
+              <Panel key={item.id} variant="parchment" className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-parchment-300 pb-2">
+                  <span className="font-display text-xs font-semibold uppercase tracking-wider text-gold-600">
+                    {item.category.replace(/_/g, " ")}
+                  </span>
+                  {item.publishedAt ? (
+                    <span className="text-xs text-stone-500">
+                      {new Date(item.publishedAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </span>
+                  ) : null}
+                </div>
+                <h3 className="text-xl font-bold">{item.title}</h3>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-stone-800">
+                  {item.content}
+                </p>
+              </Panel>
+            ))}
+          </div>
+        ) : (
+          <Panel className="text-stone-300">
+            <p>No proclamations yet.</p>
+            <p className="mt-1 text-sm text-stone-400">
+              When the Creator or the crown speaks, it will be written here.
+            </p>
+          </Panel>
+        )}
       </Section>
     </>
   );
