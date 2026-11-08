@@ -1,6 +1,7 @@
 import type { Database } from "@dragonhold/db";
 import { sql } from "drizzle-orm";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { HttpError } from "./lib/errors";
 import { originGuard } from "./middleware/origin-guard";
@@ -16,6 +17,22 @@ export function createApp(db: Database, config: AppConfig) {
     c.set("config", config);
     await next();
   });
+
+  app.use(
+    "*",
+    cors({
+      origin: (origin, c) => {
+        const allowed = c.get("config").webOrigins;
+        if (!origin) return allowed[0] ?? "";
+        return allowed.includes(origin) ? origin : null;
+      },
+      credentials: true,
+      allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      maxAge: 86400,
+    }),
+  );
+
   app.use(originGuard);
 
   // Liveness probe (fast 200 OK)

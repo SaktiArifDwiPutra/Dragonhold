@@ -33,7 +33,7 @@ export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
     .limit(1);
 
   if (!row || row.expiresAt.getTime() <= Date.now()) {
-    clearSessionCookie(c);
+    clearSessionCookie(c, c.get("config").cookieDomain);
     throw new HttpError(401, "UNAUTHENTICATED", "Sesi tidak valid atau sudah berakhir.");
   }
 
