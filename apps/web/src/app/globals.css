@@ -1,42 +1,63 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy-950: #0a101d;
-  --color-navy-900: #0f1829;
-  --color-navy-800: #16243c;
-  --color-navy-700: #203350;
+  --color-canvas-base: #0a0e18;
+  --color-canvas-surface: #0f131d;
+  --color-canvas-subtle: #171b26;
+  --color-canvas-elevated: #1c1f2a;
+  --color-canvas-border: #262a35;
 
-  --color-charcoal-950: #111214;
-  --color-charcoal-900: #191b1f;
-  --color-charcoal-800: #23262b;
-  --color-charcoal-700: #30343b;
+  /* Modern nocturnal dark foundation with legacy aliases */
+  --color-navy-950: #0a0e18;
+  --color-navy-900: #0f131d;
+  --color-navy-800: #171b26;
+  --color-navy-700: #262a35;
 
-  /* emas dipakai sebagai aksen, bukan di semua komponen */
-  --color-gold-300: #e6cf8e;
+  --color-charcoal-950: #0a0e18;
+  --color-charcoal-900: #11141c;
+  --color-charcoal-800: #1a1e28;
+  --color-charcoal-700: #262a35;
+
+  /* Sovereign Metallics */
+  --color-gold-300: #eac16e;
   --color-gold-400: #d4b564;
-  --color-gold-500: #c19a3f;
-  --color-gold-600: #9a7a2f;
+  --color-gold-500: #c8a253;
+  --color-gold-600: #997a32;
+  --color-gold-sovereign: #c8a253;
+  --color-gold-aura: #eac16e;
+  --color-gold-relic: #997a32;
+  --color-bronze-hardware: #8c6239;
 
+  /* Tactile Parchment & Iron Gall Inks */
   --color-parchment-50: #faf3df;
-  --color-parchment-100: #f2e7c9;
-  --color-parchment-200: #e6d5a9;
-  --color-parchment-300: #d2bc86;
+  --color-parchment-100: #f4ebd0;
+  --color-parchment-200: #e6d7b5;
+  --color-parchment-300: #d4c49e;
+  --color-parchment-border: #d4c49e;
+  --color-ink: #1f1d1a;
+  --color-ink-muted: #4a453e;
 
-  --color-ink: #2a2017;
+  /* Imperial Seals & Accents */
+  --color-burgundy-500: #8a2525;
+  --color-burgundy-600: #611717;
+  --color-seal-crimson: #8a2525;
+  --color-seal-deep: #611717;
 
-  --color-burgundy-500: #7b2c3a;
-  --color-burgundy-600: #5e2230;
   --color-forest-500: #3f6c4b;
   --color-forest-600: #2f5239;
-  --color-stone-300: #b8b5ab;
-  --color-stone-400: #8f8c82;
-  --color-stone-500: #6d6a61;
+  --color-stone-300: #dfe2f1;
+  --color-stone-400: #9a8f7f;
+  --color-stone-500: #6b6356;
 }
 
 @theme inline {
-  /* font pixel hanya untuk judul dan tombol; isi tetap memakai serif yang mudah dibaca */
-  --font-display: var(--font-pixel), ui-monospace, monospace;
-  --font-body: var(--font-lora), Georgia, serif;
+  --font-serif: var(--font-serif), Georgia, serif;
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+
+  /* Display headings use classical serif; body & UI use crisp sans */
+  --font-display: var(--font-serif), Georgia, serif;
+  --font-body: var(--font-sans), system-ui, sans-serif;
 }
 
 @layer base {
@@ -45,12 +66,11 @@
   }
 
   body {
-    @apply bg-navy-950 text-parchment-100 font-body antialiased;
-    /* pola kotak sangat tipis, hanya sebagai tekstur */
+    @apply bg-navy-950 text-stone-300 font-body antialiased;
     background-image:
-      linear-gradient(rgb(255 255 255 / 0.015) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(255 255 255 / 0.015) 1px, transparent 1px);
-    background-size: 8px 8px;
+      linear-gradient(rgb(255 255 255 / 0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.012) 1px, transparent 1px);
+    background-size: 16px 16px;
   }
 
   h1,
@@ -66,7 +86,48 @@
 
   ::selection {
     background: var(--color-gold-500);
-    color: var(--color-navy-950);
+    color: var(--color-canvas-base);
+  }
+}
+
+@layer utilities {
+  .bracket-corners {
+    position: relative;
+  }
+  .bracket-corners::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 6px;
+    height: 6px;
+    border-top: 2px solid var(--color-gold-sovereign);
+    border-left: 2px solid var(--color-gold-sovereign);
+    pointer-events: none;
+  }
+  .bracket-corners::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 6px;
+    height: 6px;
+    border-bottom: 2px solid var(--color-gold-sovereign);
+    border-right: 2px solid var(--color-gold-sovereign);
+    pointer-events: none;
+  }
+  .parchment-sheet {
+    background-color: var(--color-parchment-100);
+    color: var(--color-ink);
+    border: 4px double var(--color-parchment-border);
+    box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.7);
+  }
+  .wax-seal {
+    background-color: var(--color-seal-crimson);
+    border: 1px solid rgba(234, 193, 110, 0.4);
+    box-shadow:
+      0 2px 8px rgba(138, 37, 37, 0.5),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2);
   }
 }
 
