@@ -4,6 +4,7 @@
   "packageManager": "pnpm@9.15.0",
   "engines": { "node": ">=20" },
   "scripts": {
+    "test": "pnpm --filter @dragonhold/api test",
     "typecheck": "pnpm -r typecheck",
     "db:generate": "pnpm --filter @dragonhold/db db:generate",
     "db:migrate": "pnpm --filter @dragonhold/db db:migrate",
