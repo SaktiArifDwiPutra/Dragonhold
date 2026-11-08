@@ -37,6 +37,28 @@ authRoutes.post(
   validate("json", registerSchema),
   async (c) => {
     const input = c.req.valid("json");
+    const config = c.get("config");
+
+    if (config.registrationMode === "closed_beta") {
+      // Fail-closed: jika server tidak punya konfigurasi kode beta, tolak pendaftaran
+      if (!config.betaAccessCode || config.betaAccessCode.trim() === "") {
+        throw new HttpError(
+          503,
+          "REGISTRATION_UNAVAILABLE",
+          "Pendaftaran closed beta sedang ditutup.",
+        );
+      }
+      const provided = input.betaCode?.trim();
+      const expected = config.betaAccessCode.trim();
+      if (!provided || provided.toLowerCase() !== expected.toLowerCase()) {
+        throw new HttpError(
+          403,
+          "INVALID_BETA_CODE",
+          "Kode akses closed beta tidak valid.",
+        );
+      }
+    }
+
     const db = c.get("db");
     const passwordHash = await hash(input.password); // Argon2id
 
@@ -76,7 +98,7 @@ authRoutes.post(
     }
 
     const token = await createSession(db, created.user.id);
-    setSessionCookie(c, token, c.get("config").isProd);
+    setSessionCookie(c, token, config.isProd, config.cookieDomain);
 
     return c.json(
       {
@@ -95,6 +117,7 @@ authRoutes.post(
   async (c) => {
     const { email, password } = c.req.valid("json");
     const db = c.get("db");
+    const config = c.get("config");
 
     const [user] = await db
       .select()
@@ -121,7 +144,7 @@ authRoutes.post(
       .limit(1);
 
     const token = await createSession(db, user.id);
-    setSessionCookie(c, token, c.get("config").isProd);
+    setSessionCookie(c, token, config.isProd, config.cookieDomain);
 
     return c.json({
       user: { id: user.id, username: user.username, role: user.role },
@@ -138,7 +161,7 @@ authRoutes.post("/logout", async (c) => {
       .delete(sessions)
       .where(eq(sessions.tokenHash, hashToken(token)));
   }
-  clearSessionCookie(c);
+  clearSessionCookie(c, c.get("config").cookieDomain);
   return c.body(null, 204);
 });
 

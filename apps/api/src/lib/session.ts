@@ -30,16 +30,25 @@ export async function createSession(db: Database, userId: string) {
   return token;
 }
 
-export function setSessionCookie(c: Context, token: string, isProd: boolean) {
+export function setSessionCookie(
+  c: Context,
+  token: string,
+  isProd: boolean,
+  cookieDomain?: string,
+) {
   setCookie(c, SESSION_COOKIE, token, {
     httpOnly: true,
     secure: isProd,
     sameSite: "Lax",
     path: "/",
+    domain: cookieDomain || undefined,
     maxAge: SESSION_TTL_MS / 1000,
   });
 }
 
-export function clearSessionCookie(c: Context) {
-  deleteCookie(c, SESSION_COOKIE, { path: "/" });
+export function clearSessionCookie(c: Context, cookieDomain?: string) {
+  deleteCookie(c, SESSION_COOKIE, {
+    path: "/",
+    domain: cookieDomain || undefined,
+  });
 }

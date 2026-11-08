@@ -24,6 +24,7 @@ export const registerSchema = z
       .min(10, "Password must be at least 10 characters.")
       .max(128, "Password must be at most 128 characters."),
     confirmPassword: z.string(),
+    betaCode: z.string().trim().optional(),
   })
   .refine((d) => d.password === d.confirmPassword, {
     path: ["confirmPassword"],
