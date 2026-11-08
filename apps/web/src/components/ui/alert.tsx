@@ -14,8 +14,8 @@ export function Alert({
       className={cx(
         "border-2 px-4 py-3 text-sm",
         variant === "error"
-          ? "border-burgundy-500 bg-burgundy-600/30 text-red-100"
-          : "border-forest-500 bg-forest-600/30 text-parchment-100",
+          ? "border-seal-crimson bg-seal-crimson/20 text-red-100 shadow-md"
+          : "border-forest-500 bg-forest-600/20 text-emerald-100 shadow-md",
       )}
     >
       {children}
