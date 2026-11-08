@@ -6,18 +6,6 @@ import { buttonStyles } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
 import { cx } from "@/lib/cx";
 
-// TODO (Phase 3): ganti dengan data asli dari GET /government.
-// Nama dan deskripsi jabatan ini masih usulan awal.
-const plannedPositions = [
-  {
-    name: "Sovereign",
-    description: "King or Queen of Dragonhold. The first ruler will be chosen by election.",
-  },
-  { name: "Chancellor", description: "Chief advisor to the crown." },
-  { name: "Marshal", description: "Keeper of the kingdom's defence." },
-  { name: "Steward", description: "Guardian of the kingdom's treasury." },
-];
-
 function Section({
   id,
   eyebrow,
@@ -30,12 +18,12 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-20 border-t-2 border-navy-800 py-16">
+    <section id={id} className="scroll-mt-20 border-t border-canvas-border py-16">
       <div className="mx-auto max-w-5xl px-4">
-        <p className="font-display text-sm uppercase tracking-widest text-gold-400">
+        <p className="font-sans text-xs font-semibold uppercase tracking-widest text-gold-400">
           {eyebrow}
         </p>
-        <h2 className="mt-2 text-3xl sm:text-4xl">{title}</h2>
+        <h2 className="mt-2 text-3xl sm:text-4xl font-serif text-parchment-50">{title}</h2>
         <div className="mt-6">{children}</div>
       </div>
     </section>
@@ -69,42 +57,55 @@ export default async function HomePage() {
   const announcements = await getAnnouncements();
 
   return (
-    <div className="pb-16 sm:pb-0">
+    <div className="pb-28 sm:pb-0">
       {/* 1. Hero */}
       <section className="mx-auto flex max-w-5xl flex-col items-center px-4 py-16 text-center sm:py-24">
         <div className="relative">
-          <div className="absolute -inset-4 rounded-full bg-gold-500/10 blur-xl" />
-          <Emblem className="relative h-24 w-24 sm:h-32 sm:w-32 drop-shadow-[0_0_20px_rgba(234,179,8,0.25)] transition-transform hover:scale-105" />
+          <div className="absolute -inset-4 rounded-full bg-gold-sovereign/10 blur-xl pointer-events-none" />
+          <div className="relative p-3 border border-gold-sovereign/30 bg-canvas-surface shadow-[0_0_30px_rgba(200,162,83,0.12)]">
+            <span className="pointer-events-none absolute -top-1 -left-1 h-2.5 w-2.5 border-t-2 border-l-2 border-gold-sovereign" />
+            <span className="pointer-events-none absolute -top-1 -right-1 h-2.5 w-2.5 border-t-2 border-r-2 border-gold-sovereign" />
+            <span className="pointer-events-none absolute -bottom-1 -left-1 h-2.5 w-2.5 border-b-2 border-l-2 border-gold-sovereign" />
+            <span className="pointer-events-none absolute -bottom-1 -right-1 h-2.5 w-2.5 border-b-2 border-r-2 border-gold-sovereign" />
+            <Emblem className="h-20 w-20 sm:h-28 sm:w-28 drop-shadow-md transition-transform hover:scale-105" />
+          </div>
         </div>
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-gold-500/30 bg-navy-950/80 px-3 py-1 text-xs font-display tracking-widest text-gold-400">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gold-400" />
+
+        <div className="mt-6 inline-flex items-center gap-2 rounded border border-gold-sovereign/30 bg-canvas-base px-3 py-1 font-mono text-xs uppercase tracking-widest text-gold-300">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gold-sovereign" />
           <span>POLITICAL FANTASY REALM · EPISODE 001</span>
         </div>
-        <h1 className="mt-4 text-4xl sm:text-6xl md:text-7xl tracking-widest font-display text-parchment-50">
+
+        <h1 className="mt-4 text-4xl sm:text-6xl md:text-7xl font-serif tracking-widest text-parchment-50">
           DRAGONHOLD
         </h1>
-        <p className="mt-3 font-display text-lg text-gold-300 sm:text-2xl">
+
+        <p className="mt-3 font-serif text-lg text-gold-300 sm:text-2xl">
           A Kingdom Yet to Be Written.
         </p>
-        <p className="mt-4 max-w-2xl text-base sm:text-lg leading-relaxed text-parchment-200">
-          In the world of Aetherial, humanity is rebuilding after a war against the
-          dragons. Dragonhold is a newly founded kingdom whose throne is empty and whose
-          history is yet to be written. Become a citizen, and help write it.
+
+        <p className="mt-4 max-w-2xl text-base sm:text-lg leading-relaxed text-stone-300">
+          In the world of Aetherial, humanity is rebuilding after a devastating war against the dragons.
+          Dragonhold is a newly founded kingdom whose throne is empty and whose history is yet to be written.
+          Become a citizen, and help write it.
         </p>
 
-        {/* Quest Status HUD */}
-        <div className="mt-8 grid w-full max-w-md grid-cols-3 gap-2 border border-navy-700 bg-navy-950/90 p-2 text-center text-xs backdrop-blur-sm sm:max-w-lg sm:p-3">
-          <div className="border-r border-navy-800 p-1">
-            <p className="text-[10px] uppercase tracking-wider text-stone-400">Throne</p>
-            <p className="mt-0.5 font-bold text-amber-400">VACANT</p>
+        {/* 3-Entry Canonical Realm State HUD (No fake data or filler 4th cards) */}
+        <div className="mt-8 grid w-full max-w-md grid-cols-3 gap-2 border border-canvas-border bg-canvas-surface/90 p-2 text-center text-xs backdrop-blur-sm sm:max-w-xl sm:p-3 shadow-lg">
+          <div className="border-r border-canvas-border p-1.5 sm:p-2">
+            <p className="font-sans text-[10px] uppercase tracking-wider text-stone-400">Throne</p>
+            <p className="mt-0.5 font-sans font-bold text-amber-400 sm:text-sm">VACANT</p>
+            <p className="hidden text-[9px] text-stone-500 sm:block">Interregnum</p>
           </div>
-          <div className="border-r border-navy-800 p-1">
-            <p className="text-[10px] uppercase tracking-wider text-stone-400">Status</p>
-            <p className="mt-0.5 font-bold text-emerald-400">FOUNDED</p>
+          <div className="border-r border-canvas-border p-1.5 sm:p-2">
+            <p className="font-sans text-[10px] uppercase tracking-wider text-stone-400">Status</p>
+            <p className="mt-0.5 font-sans font-bold text-emerald-400 sm:text-sm">NEWLY ESTABLISHED</p>
+            <p className="hidden text-[9px] text-stone-500 sm:block">Era I · Post-War</p>
           </div>
-          <div className="p-1">
-            <p className="text-[10px] uppercase tracking-wider text-stone-400">Chronicle</p>
-            <p className="mt-0.5 font-bold text-gold-300">BLANK</p>
+          <div className="p-1.5 sm:p-2">
+            <p className="font-sans text-[10px] uppercase tracking-wider text-stone-400">Chronicles</p>
+            <p className="mt-0.5 font-sans font-bold text-gold-300 sm:text-sm">BLANK</p>
+            <p className="hidden text-[9px] text-stone-500 sm:block">Awaiting First Record</p>
           </div>
         </div>
 
@@ -115,7 +116,7 @@ export default async function HomePage() {
 
       {/* 2. World introduction */}
       <Section id="world" eyebrow="The World" title="Aetherial, After the War">
-        <div className="max-w-3xl space-y-4 text-base sm:text-lg leading-relaxed text-parchment-200">
+        <div className="max-w-3xl space-y-4 text-base sm:text-lg leading-relaxed text-stone-300">
           <p>
             Not long ago, humanity fought a devastating war against the dragons. In
             Aetherial, dragons are not rumours or bedtime stories. People know they exist,
@@ -127,21 +128,21 @@ export default async function HomePage() {
           </p>
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <Panel brackets variant="hud">
-            <h3 className="text-lg font-bold text-gold-300">A War Remembered</h3>
-            <p className="mt-2 text-sm leading-relaxed text-stone-300">
+          <Panel variant="dark">
+            <h3 className="font-serif text-lg font-bold text-gold-300">A War Remembered</h3>
+            <p className="mt-2 text-sm leading-relaxed text-stone-400">
               The scars of the dragon war are fresh, and no one has forgotten them.
             </p>
           </Panel>
-          <Panel brackets variant="hud">
-            <h3 className="text-lg font-bold text-gold-300">Dragons Unseen</h3>
-            <p className="mt-2 text-sm leading-relaxed text-stone-300">
+          <Panel variant="dark" brackets>
+            <h3 className="font-serif text-lg font-bold text-gold-300">Dragons Unseen</h3>
+            <p className="mt-2 text-sm leading-relaxed text-stone-400">
               Seldom glimpsed, never dismissed. Their shadow still hangs over the world.
             </p>
           </Panel>
-          <Panel brackets variant="hud">
-            <h3 className="text-lg font-bold text-gold-300">A World to Rebuild</h3>
-            <p className="mt-2 text-sm leading-relaxed text-stone-300">
+          <Panel variant="dark">
+            <h3 className="font-serif text-lg font-bold text-gold-300">A World to Rebuild</h3>
+            <p className="mt-2 text-sm leading-relaxed text-stone-400">
               Humanity has been given a chance to start again, and a kingdom to start it in.
             </p>
           </Panel>
@@ -149,10 +150,9 @@ export default async function HomePage() {
       </Section>
 
       {/* 3. Kingdom overview */}
-      {/* TODO (Phase 3): baca status ini dari GET /kingdom */}
       <Section id="kingdom" eyebrow="The Kingdom" title="Dragonhold, Newly Founded">
         <div className="grid gap-8 lg:grid-cols-2">
-          <div className="space-y-4 text-base sm:text-lg leading-relaxed text-parchment-200">
+          <div className="space-y-4 text-base sm:text-lg leading-relaxed text-stone-300">
             <p>
               Dragonhold was founded by the Creator, the divine creator of Aetherial, to give
               humanity an opportunity to rebuild its civilization.
@@ -163,24 +163,24 @@ export default async function HomePage() {
               people who live there.
             </p>
           </div>
-          <Panel variant="parchment" brackets>
-            <h3 className="text-xl font-bold">Kingdom Status</h3>
+          <Panel variant="dark" brackets>
+            <h3 className="font-serif text-xl font-bold text-gold-300">Kingdom Status</h3>
             <dl className="mt-4 space-y-3 text-sm">
-              <div className="flex justify-between gap-4 border-b border-parchment-300 pb-2">
-                <dt className="text-stone-700">Status</dt>
-                <dd className="font-semibold text-emerald-800">Newly established</dd>
+              <div className="flex justify-between gap-4 border-b border-canvas-border pb-2">
+                <dt className="text-stone-400">Status</dt>
+                <dd className="font-semibold text-emerald-400">NEWLY ESTABLISHED</dd>
               </div>
-              <div className="flex justify-between gap-4 border-b border-parchment-300 pb-2">
-                <dt className="text-stone-700">First ruler</dt>
-                <dd className="font-semibold text-amber-800">Not yet chosen (Vacant)</dd>
+              <div className="flex justify-between gap-4 border-b border-canvas-border pb-2">
+                <dt className="text-stone-400">First ruler</dt>
+                <dd className="font-semibold text-amber-400">Not yet chosen (Vacant)</dd>
               </div>
-              <div className="flex justify-between gap-4 border-b border-parchment-300 pb-2">
-                <dt className="text-stone-700">Government</dt>
-                <dd className="font-semibold text-stone-800">Not yet formed</dd>
+              <div className="flex justify-between gap-4 border-b border-canvas-border pb-2">
+                <dt className="text-stone-400">Government</dt>
+                <dd className="font-semibold text-stone-300">Not yet formed</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-stone-700">Chronicles</dt>
-                <dd className="font-semibold text-stone-800">The first page is blank</dd>
+                <dt className="text-stone-400">Chronicles</dt>
+                <dd className="font-semibold text-gold-300">The first page is blank</dd>
               </div>
             </dl>
           </Panel>
@@ -188,32 +188,31 @@ export default async function HomePage() {
       </Section>
 
       {/* 4. Government preview */}
-      {/* TODO (Phase 3): ambil dari GET /government setelah struktur resmi ditetapkan */}
       <Section id="government" eyebrow="Government" title="A Government Yet to Be Formed">
-        <p className="max-w-3xl text-base sm:text-lg leading-relaxed text-parchment-200">
+        <p className="max-w-3xl text-base sm:text-lg leading-relaxed text-stone-300">
           Dragonhold has no formed government. Offices and their holders will appear here once
           they are established.
         </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <Panel brackets variant="hud" className="flex items-start justify-between gap-4">
+          <Panel variant="dark" className="flex items-start justify-between gap-4">
             <div>
-              <h3 className="text-lg font-bold text-gold-300">The Crown</h3>
-              <p className="mt-2 text-sm leading-relaxed text-stone-300">
+              <h3 className="font-serif text-lg font-bold text-gold-300">The Crown</h3>
+              <p className="mt-2 text-sm leading-relaxed text-stone-400">
                 The first king or queen of Dragonhold has not been chosen.
               </p>
             </div>
-            <span className="shrink-0 rounded border border-amber-500/60 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-300">
+            <span className="shrink-0 rounded border border-amber-500/60 bg-amber-500/10 px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider text-amber-300">
               Vacant
             </span>
           </Panel>
-          <Panel brackets variant="hud" className="flex items-start justify-between gap-4">
+          <Panel variant="dark" className="flex items-start justify-between gap-4">
             <div>
-              <h3 className="text-lg font-bold text-gold-300">Other Offices</h3>
-              <p className="mt-2 text-sm leading-relaxed text-stone-300">
+              <h3 className="font-serif text-lg font-bold text-gold-300">Other Offices</h3>
+              <p className="mt-2 text-sm leading-relaxed text-stone-400">
                 The structure of government has not yet been defined.
               </p>
             </div>
-            <span className="shrink-0 rounded border border-stone-500 bg-stone-500/10 px-2.5 py-1 text-xs uppercase tracking-wider text-stone-300">
+            <span className="shrink-0 rounded border border-stone-600 bg-stone-700/20 px-2.5 py-1 font-mono text-xs uppercase tracking-wider text-stone-400">
               Not established
             </span>
           </Panel>
@@ -222,27 +221,27 @@ export default async function HomePage() {
 
       {/* 5. Community participation */}
       <Section id="participate" eyebrow="Community" title="Your Voice Will Shape the Realm">
-        <p className="max-w-3xl text-base sm:text-lg leading-relaxed text-parchment-200">
+        <p className="max-w-3xl text-base sm:text-lg leading-relaxed text-stone-300">
           Dragonhold is not a kingdom you watch. Once the community is ready, citizens will
           take part in the decisions that define it.
         </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <Panel brackets variant="hud">
-            <h3 className="text-lg font-bold text-gold-300">Elect</h3>
-            <p className="mt-2 text-sm leading-relaxed text-stone-300">
+          <Panel variant="dark">
+            <h3 className="font-serif text-lg font-bold text-gold-300">Elect</h3>
+            <p className="mt-2 text-sm leading-relaxed text-stone-400">
               Stand as a candidate or vote for who will hold the crown, once elections open.
             </p>
           </Panel>
-          <Panel brackets variant="hud">
-            <h3 className="text-lg font-bold text-gold-300">Decide</h3>
-            <p className="mt-2 text-sm leading-relaxed text-stone-300">
+          <Panel variant="dark">
+            <h3 className="font-serif text-lg font-bold text-gold-300">Decide</h3>
+            <p className="mt-2 text-sm leading-relaxed text-stone-400">
               Vote on the matters that affect the whole kingdom whenever the realm calls on its
               citizens.
             </p>
           </Panel>
-          <Panel brackets variant="hud">
-            <h3 className="text-lg font-bold text-gold-300">Be Remembered</h3>
-            <p className="mt-2 text-sm leading-relaxed text-stone-300">
+          <Panel variant="dark">
+            <h3 className="font-serif text-lg font-bold text-gold-300">Be Remembered</h3>
+            <p className="mt-2 text-sm leading-relaxed text-stone-400">
               What the kingdom decides is recorded in its chronicles, and those records stay.
             </p>
           </Panel>
@@ -252,36 +251,57 @@ export default async function HomePage() {
         </div>
       </Section>
 
-      {/* 6. Latest announcements */}
+      {/* 6. Latest announcements (Authentic Parchment Proclamation with Wax Seal) */}
       <Section id="announcements" eyebrow="Proclamations" title="Latest Announcements">
         {announcements.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {announcements.map((item) => (
-              <Panel key={item.id} variant="parchment" brackets className="space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-parchment-300 pb-2">
-                  <span className="font-display text-xs font-semibold uppercase tracking-wider text-gold-700">
-                    📜 {item.category.replace(/_/g, " ")}
-                  </span>
-                  {item.publishedAt ? (
-                    <span className="text-xs text-stone-600 font-mono">
-                      {new Date(item.publishedAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+              <div
+                key={item.id}
+                className="parchment-sheet relative p-6 sm:p-8 transition-all duration-200"
+              >
+                {/* Top header with category and wax seal mark */}
+                <div className="flex items-start justify-between gap-4 border-b border-[#c2b28c] pb-3 mb-4">
+                  <div>
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#633f19]">
+                      📜 {item.category.replace(/_/g, " ")}
                     </span>
-                  ) : null}
+                    {item.publishedAt ? (
+                      <p className="text-xs font-mono text-[#5c4300] mt-0.5">
+                        {new Date(item.publishedAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                    ) : null}
+                  </div>
+                  {/* Wax Seal Signet Accent */}
+                  <div
+                    aria-label="Official Imperial Seal"
+                    className="wax-seal flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-parchment-50 shadow-md"
+                  >
+                    <span className="font-serif text-sm font-bold">DH</span>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold">{item.title}</h3>
-                <p className="whitespace-pre-line text-sm leading-relaxed text-stone-800">
+
+                <h3 className="font-serif text-2xl font-bold text-[#1f1d1a] leading-snug">
+                  {item.title}
+                </h3>
+                <p className="mt-3 whitespace-pre-line text-sm sm:text-base leading-relaxed text-[#2c2825]">
                   {item.content}
                 </p>
-              </Panel>
+
+                <div className="mt-5 pt-3 border-t border-[#d4c49e] flex items-center justify-between text-xs text-[#5c4300] font-medium">
+                  <span>Archival Record · High Realm of Aetherial</span>
+                  <span className="font-mono uppercase text-[10px]">Vault Verified</span>
+                </div>
+              </div>
             ))}
           </div>
         ) : (
-          <Panel brackets variant="hud" className="text-stone-300">
-            <p className="font-semibold text-gold-400">No proclamations yet.</p>
+          <Panel variant="dark" brackets className="text-stone-300">
+            <p className="font-serif font-bold text-gold-400">No proclamations yet.</p>
             <p className="mt-1 text-sm text-stone-400">
               When the Creator or the crown speaks, it will be written here.
             </p>
@@ -289,20 +309,20 @@ export default async function HomePage() {
         )}
       </Section>
 
-      {/* 7. Mobile Sticky Quick-Action Bar (80% mobile viewers ergonomics) */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between gap-3 border-t border-gold-500/40 bg-navy-950/95 p-3 backdrop-blur-md sm:hidden shadow-2xl">
+      {/* 7. Public Mobile Sticky Quick-Action Bar (Safe-Area Insets & 48px Touch Targets) */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between gap-3 border-t border-gold-sovereign/30 bg-canvas-base/95 p-3.5 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-md sm:hidden shadow-2xl">
         <div className="flex items-center gap-2.5 pl-1">
           <Emblem className="h-7 w-7" />
           <div className="text-left">
-            <p className="font-display text-[10px] uppercase tracking-wider text-gold-400">Dragonhold</p>
-            <p className="text-xs font-semibold text-parchment-100">Episode 001</p>
+            <p className="font-serif text-xs uppercase tracking-wider text-gold-400">Dragonhold</p>
+            <p className="font-sans text-[11px] text-stone-300">Episode 001</p>
           </div>
         </div>
         <Link
           href="/register"
           className={cx(
             buttonStyles({ size: "md" }),
-            "px-4 py-2 text-xs font-bold shadow-md",
+            "px-4 text-xs font-bold shadow-md",
           )}
         >
           Become Citizen
