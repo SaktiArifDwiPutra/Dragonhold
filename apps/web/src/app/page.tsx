@@ -82,7 +82,7 @@ export default async function HomePage() {
           />
           {/* Cinematic Vignettes and Atmospheric Fog Layers */}
           <div className="absolute inset-0 bg-gradient-to-t from-canvas-base via-canvas-base/60 to-transparent" />
-          <div className="absolute inset-0 bg-radial-gradient from-transparent via-canvas-base/30 to-canvas-base/90 pointer-events-none" />
+          
           <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-canvas-base/90 to-transparent" />
         </div>
 
@@ -166,7 +166,7 @@ export default async function HomePage() {
               <div className="aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden">
                 <img
                   src="/images/episode-001.jpg"
-                  alt="Episode 001: The Cessation of Dragonfire aftermath in Aetherial"
+                  alt="Episode 001 aftermath in Aetherial"
                   className="h-full w-full object-cover filter brightness-90 contrast-105 transition-transform duration-700 ease-out group-hover:scale-105"
                 />
               </div>
@@ -185,15 +185,15 @@ export default async function HomePage() {
               </div>
 
               <h2 className="mt-2 text-2xl sm:text-3xl font-display tracking-wider text-parchment-50 leading-tight">
-                Episode 001: The Cessation of Dragonfire
+                Episode 001
               </h2>
 
               <p className="mt-4 font-serif text-base leading-relaxed text-stone-300">
-                The colossal shadow has fallen, but the earth still smolders. As the last dragonfire fades from the mountain crests, the survivors gather at the gates of Dragonhold.
+                Humanity is rebuilding after the war against the dragons. Dragonhold is a newly founded kingdom with an empty throne.
               </p>
 
               <p className="mt-3 text-sm leading-relaxed text-stone-400">
-                With the ancient kings lost and the throne room quiet, the Creator beckons humanity to take up the mantle. No divine ruler will decide the realm’s fate — the future belongs to those who step forward.
+                The Creator does not rule Dragonhold. Who becomes its first king or queen is meant to be answered by the people who live there.
               </p>
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -215,62 +215,28 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 3: WORLD OF AETHERIAL — ATLAS & REGIONAL EXPLORATION */}
+      {/* SECTION 3: WORLD OF AETHERIAL — only established lore; map artwork pending */}
       <Section
         id="world"
         eyebrow="The World"
-        title="Atlas of Aetherial"
-        subtitle="Explore the lands scarred by the war against dragons, where humanity now carves its future."
+        title="Aetherial, After the War"
+        subtitle="Humanity fought a devastating war against the dragons. The dragons are rarely seen now, and their absence brings mystery rather than peace."
       >
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <div className="relative border border-canvas-border bg-canvas-surface p-5 transition-all hover:border-gold-sovereign/50 hover:shadow-lg">
-            <span className="font-mono text-xs font-bold text-gold-400">PROVINCE I</span>
-            <h3 className="mt-2 text-lg font-display text-parchment-50">Dragonhold Citadel</h3>
-            <p className="mt-2 text-xs sm:text-sm text-stone-400 leading-relaxed">
-              Carved directly into the sheer granite of the Wyrmtooth Range, this mountain fortress serves as humanity's first sovereign sanctuary.
-            </p>
-            <div className="mt-4 pt-3 border-t border-canvas-border flex items-center justify-between text-[11px] font-mono text-stone-500">
-              <span>Status: Founded</span>
-              <span className="text-emerald-400">Secure</span>
-            </div>
-          </div>
-
-          <div className="relative border border-canvas-border bg-canvas-surface p-5 transition-all hover:border-gold-sovereign/50 hover:shadow-lg">
-            <span className="font-mono text-xs font-bold text-gold-400">PROVINCE II</span>
-            <h3 className="mt-2 text-lg font-display text-parchment-50">The Ashen Wastes</h3>
-            <p className="mt-2 text-xs sm:text-sm text-stone-400 leading-relaxed">
-              The desolate lowlands where the final dragon confrontation ended. Smoldering rifts and dragonbone relics remain unexcavated.
-            </p>
-            <div className="mt-4 pt-3 border-t border-canvas-border flex items-center justify-between text-[11px] font-mono text-stone-500">
-              <span>Status: Scourged</span>
-              <span className="text-amber-400">Unsettled</span>
-            </div>
-          </div>
-
-          <div className="relative border border-canvas-border bg-canvas-surface p-5 transition-all hover:border-gold-sovereign/50 hover:shadow-lg">
-            <span className="font-mono text-xs font-bold text-gold-400">PROVINCE III</span>
-            <h3 className="mt-2 text-lg font-display text-parchment-50">The Vault Chancery</h3>
-            <p className="mt-2 text-xs sm:text-sm text-stone-400 leading-relaxed">
-              Subterranean archives housing historical scrolls, treaties, and the official citizen cartulary under lock and seal.
-            </p>
-            <div className="mt-4 pt-3 border-t border-canvas-border flex items-center justify-between text-[11px] font-mono text-stone-500">
-              <span>Status: Intact</span>
-              <span className="text-emerald-400">Guarded</span>
-            </div>
-          </div>
-
-          <div className="relative border border-canvas-border bg-canvas-surface p-5 transition-all hover:border-gold-sovereign/50 hover:shadow-lg">
-            <span className="font-mono text-xs font-bold text-gold-400">PROVINCE IV</span>
-            <h3 className="mt-2 text-lg font-display text-parchment-50">The Uncharted Marches</h3>
-            <p className="mt-2 text-xs sm:text-sm text-stone-400 leading-relaxed">
-              Vast untamed territories stretching beyond the frontier. Future expeditions and territorial charters await citizen votes.
-            </p>
-            <div className="mt-4 pt-3 border-t border-canvas-border flex items-center justify-between text-[11px] font-mono text-stone-500">
-              <span>Status: Unknown</span>
-              <span className="text-stone-400">Frontier</span>
-            </div>
-          </div>
-        </div>
+        <ol className="relative space-y-0 border-l border-gold-sovereign/40 pl-6 sm:pl-8">
+          {[
+            ["I", "The War", "Humanity fought the dragons. The scars are fresh and no one has forgotten them."],
+            ["II", "The Silence", "The dragons are rarely seen. Their shadow still hangs over the world."],
+            ["III", "The Rebuilding", "Survivors rebuild what was lost, and a new kingdom, Dragonhold, is founded for it."],
+          ].map(([n, t, d]) => (
+            <li key={n} className="relative pb-8 last:pb-0">
+              <span className="absolute -left-[33px] sm:-left-[41px] top-0 flex h-6 w-6 items-center justify-center border border-gold-sovereign bg-canvas-base font-mono text-[10px] text-gold-300">
+                {n}
+              </span>
+              <h3 className="font-display text-lg text-parchment-50">{t}</h3>
+              <p className="mt-1 max-w-xl font-serif text-sm sm:text-base leading-relaxed text-stone-400">{d}</p>
+            </li>
+          ))}
+        </ol>
       </Section>
 
       {/* SECTION 4: THE KINGDOM'S CURRENT STATE — ENVIRONMENTAL STORYTELLING */}
@@ -295,9 +261,6 @@ export default async function HomePage() {
               </p>
               <p>
                 Yet the throne room stands quiet. There is no monarch by divine right, no hereditary lineage to dictate decrees. The first king or queen of Dragonhold will be determined through citizen participation and election when the realm is ready.
-              </p>
-              <p className="text-stone-400 italic">
-                "A kingdom without a tyrant is a kingdom where every citizen bears the crown of responsibility."
               </p>
             </div>
           </div>
@@ -328,8 +291,8 @@ export default async function HomePage() {
                 <dd className="font-mono text-gold-300">BLANK</dd>
               </div>
               <div className="flex justify-between gap-4 pt-1">
-                <dt className="text-stone-400">First Proclamation</dt>
-                <dd className="text-stone-300">Episode 001 Ready</dd>
+                <dt className="text-stone-400">Current Chapter</dt>
+                <dd className="text-stone-300">Episode 001</dd>
               </div>
             </dl>
           </div>
@@ -352,7 +315,7 @@ export default async function HomePage() {
           </p>
 
           <p className="mt-2 text-sm text-stone-400">
-            Upon entering, an indelible Citizen ID (<span className="font-mono text-gold-300 font-bold">DH-000001</span> format) is sealed to your name, granting official standing in future realm votes and decrees.
+            Upon entering, an indelible Citizen ID (<span className="font-mono text-gold-300 font-bold">DH-000001</span> format) is sealed to your name.
           </p>
 
           <div className="mt-8 flex justify-center">
@@ -365,8 +328,8 @@ export default async function HomePage() {
       <Section
         id="announcements"
         eyebrow="Proclamations"
-        title="Royal Dispatches & Decrees"
-        subtitle="Official statements issued from the Chancery Vault of Dragonhold."
+        title="Proclamations"
+        subtitle="Official statements published for Dragonhold."
       >
         {announcements.length > 0 ? (
           <div className="space-y-6">
@@ -408,8 +371,8 @@ export default async function HomePage() {
                 </p>
 
                 <div className="mt-5 pt-3 border-t border-[#d4c49e] flex items-center justify-between text-xs text-[#5c4300] font-medium">
-                  <span>Archival Record · High Realm of Aetherial</span>
-                  <span className="font-mono uppercase text-[10px]">Vault Verified</span>
+                  <span>Official Proclamation · Dragonhold</span>
+                  <span className="font-mono uppercase text-[10px]">Published</span>
                 </div>
               </div>
             ))}

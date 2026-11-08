@@ -103,7 +103,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between gap-4 border-b border-[#d4c49e] pb-3">
                 <dt className="font-sans text-stone-700">Citizen ID</dt>
                 <dd className="rounded border border-[#8c6239]/60 bg-[#e6d7b5] px-3 py-1 font-mono text-sm sm:text-base font-bold text-[#402d00] shadow-inner">
-                  {me.citizen?.citizenCode ?? "DH-000001"}
+                  {me.citizen?.citizenCode ?? "—"}
                 </dd>
               </div>
               <div className="flex items-center justify-between gap-4 border-b border-[#d4c49e] pb-3">
@@ -127,8 +127,8 @@ export default function DashboardPage() {
             </dl>
 
             <div className="mt-6 pt-3 border-t border-[#d4c49e] flex items-center justify-between text-xs text-[#5c4300] font-medium">
-              <span>Sealed in Chancery Vault B</span>
-              <span className="font-mono uppercase text-[10px]">Imperial Registry Intact</span>
+              <span>Dragonhold Registry</span>
+              <span className="font-mono uppercase text-[10px]">Official Record</span>
             </div>
           </div>
         </div>
@@ -169,10 +169,10 @@ export default function DashboardPage() {
               <span>CURRENT CHAPTER</span>
             </div>
             <h4 className="mt-1 font-display text-base text-parchment-50">
-              Episode 001: The Cessation of Dragonfire
+              Episode 001
             </h4>
             <p className="mt-2 text-xs text-stone-400 leading-relaxed font-serif">
-              The war against dragons has concluded. Humanity gathers at the gates of Dragonhold to rebuild what was lost.
+              Humanity is rebuilding after the war against the dragons.
             </p>
             <div className="mt-4">
               <Link
