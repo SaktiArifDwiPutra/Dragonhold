@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Lora } from "next/font/google";
+import { Cinzel, Inter, Lora } from "next/font/google";
 import type { ReactNode } from "react";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
+
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 const lora = Lora({
   subsets: ["latin"],
@@ -15,12 +21,6 @@ const lora = Lora({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
-  display: "swap",
-});
-
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
   display: "swap",
 });
 
@@ -37,9 +37,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${lora.variable} ${inter.variable} ${mono.variable}`}
+      className={`${cinzel.variable} ${lora.variable} ${inter.variable}`}
     >
-      <body className="flex min-h-screen flex-col font-body">
+      <body className="flex min-h-screen flex-col font-body bg-canvas-base text-stone-300">
         <AuthProvider>
           <SiteHeader />
           <main className="flex-1">{children}</main>

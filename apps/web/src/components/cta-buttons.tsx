@@ -22,18 +22,18 @@ export function CtaButtons({ showDiscover = false }: { showDiscover?: boolean })
           href="/register"
           className={cx(buttonStyles({ size: "lg" }), "w-full sm:w-auto text-center")}
         >
-          Become a Citizen
+          Enter the Kingdom
         </Link>
       )}
       {showDiscover ? (
         <Link
-          href="#world"
+          href="#chapter"
           className={cx(
             buttonStyles({ variant: "secondary", size: "lg" }),
             "w-full sm:w-auto text-center",
           )}
         >
-          Discover the Kingdom
+          Explore the World
         </Link>
       ) : null}
     </div>

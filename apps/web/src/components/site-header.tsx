@@ -32,7 +32,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5">
             <Emblem className="h-8 w-8 transition-transform hover:scale-105" />
-            <span className="font-serif text-base tracking-widest text-parchment-50 sm:text-lg">
+            <span className="font-display text-base tracking-widest text-parchment-50 sm:text-lg">
               DRAGONHOLD
             </span>
           </Link>

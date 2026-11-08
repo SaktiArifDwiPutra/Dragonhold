@@ -9,7 +9,7 @@ export function SiteFooter() {
         <div>
           <div className="flex items-center gap-3">
             <Emblem className="h-8 w-8" />
-            <span className="font-serif text-lg tracking-widest text-parchment-50">
+            <span className="font-display text-lg tracking-widest text-parchment-50">
               DRAGONHOLD
             </span>
           </div>
