@@ -6,15 +6,15 @@ export const metadata: Metadata = { title: "Become a Citizen" };
 
 export default function RegisterPage() {
   return (
-    <div className="mx-auto w-full max-w-md px-4 py-8 sm:py-14 pb-20 sm:pb-14">
-      <Panel brackets variant="hud">
-        <p className="font-display text-[10px] uppercase tracking-widest text-gold-400">
+    <div className="mx-auto w-full max-w-md px-4 py-10 sm:py-16">
+      <Panel variant="dark" brackets>
+        <p className="font-mono text-xs uppercase tracking-widest text-gold-400">
           Enlistment · Closed Beta
         </p>
-        <h1 className="mt-1 text-2xl sm:text-3xl font-display tracking-wide text-parchment-50">
+        <h1 className="mt-1 font-serif text-2xl sm:text-3xl tracking-wide text-parchment-50">
           Become a Citizen
         </h1>
-        <p className="mt-2 text-sm text-stone-300">
+        <p className="mt-2 text-sm text-stone-400">
           Take your place in Dragonhold. A Citizen ID will be sealed upon your record.
         </p>
         <div className="mt-6">

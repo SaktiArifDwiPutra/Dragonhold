@@ -74,19 +74,21 @@ export function RegisterForm() {
     <form onSubmit={onSubmit} noValidate className="space-y-5">
       {formError ? <Alert>{formError}</Alert> : null}
       <Field
-        label="Username"
+        label="Citizen Name (Username)"
         name="username"
         autoComplete="username"
+        placeholder="e.g. Aedan_Vance"
         value={values.username}
         onChange={update("username")}
         error={errors.username}
-        hint="Letters, numbers, and underscores. It also becomes your starting character name."
+        hint="Letters, numbers, and underscores. It becomes your character name and record key."
       />
       <Field
-        label="Email"
+        label="Email Address"
         name="email"
         type="email"
         autoComplete="email"
+        placeholder="aedan@dragonhold.realm"
         value={values.email}
         onChange={update("email")}
         error={errors.email}
@@ -96,35 +98,43 @@ export function RegisterForm() {
         name="password"
         type="password"
         autoComplete="new-password"
+        placeholder="At least 10 characters"
         value={values.password}
         onChange={update("password")}
         error={errors.password}
         hint="At least 10 characters."
       />
       <Field
-        label="Confirm password"
+        label="Confirm Password"
         name="confirmPassword"
         type="password"
         autoComplete="new-password"
+        placeholder="Re-enter your password"
         value={values.confirmPassword}
         onChange={update("confirmPassword")}
         error={errors.confirmPassword}
       />
-      <Field
-        label="Beta Access Code"
-        name="betaCode"
-        autoComplete="off"
-        value={values.betaCode}
-        onChange={update("betaCode")}
-        error={errors.betaCode}
-        hint="Required during closed beta. Enter the access code provided for early registration."
-      />
+      <div className="relative rounded border border-gold-sovereign/40 bg-canvas-base/80 p-3 shadow-inner">
+        <Field
+          label="Closed Beta Access Code"
+          name="betaCode"
+          autoComplete="off"
+          placeholder="DH-XXXX-XXXX"
+          value={values.betaCode}
+          onChange={update("betaCode")}
+          error={errors.betaCode}
+          hint="Required during Closed Beta. A permanent Citizen ID will be sealed upon entry."
+        />
+      </div>
       <Button type="submit" disabled={submitting} className="w-full">
-        {submitting ? "Registering…" : "Become a Citizen"}
+        {submitting ? "Sealing Record…" : "Take the Oath & Register"}
       </Button>
-      <p className="text-center text-sm text-stone-300">
-        Already a citizen?{" "}
-        <Link href="/login" className="text-gold-300 underline underline-offset-4">
+      <p className="text-center text-sm text-stone-400">
+        Already enlisted in the realm?{" "}
+        <Link
+          href="/login"
+          className="text-gold-300 underline underline-offset-4 hover:text-gold-400"
+        >
           Sign in
         </Link>
       </p>

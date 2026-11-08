@@ -55,29 +55,34 @@ export function LoginForm() {
     <form onSubmit={onSubmit} noValidate className="space-y-5">
       {formError ? <Alert>{formError}</Alert> : null}
       <Field
-        label="Email"
+        label="Email Address"
         name="email"
         type="email"
         autoComplete="email"
+        placeholder="citizen@dragonhold.realm"
         value={values.email}
         onChange={update("email")}
         error={errors.email}
       />
       <Field
-        label="Password"
+        label="Secret Key (Password)"
         name="password"
         type="password"
         autoComplete="current-password"
+        placeholder="••••••••••••"
         value={values.password}
         onChange={update("password")}
         error={errors.password}
       />
       <Button type="submit" disabled={submitting} className="w-full">
-        {submitting ? "Signing in…" : "Sign in"}
+        {submitting ? "Verifying Credentials…" : "Enter the Realm"}
       </Button>
-      <p className="text-center text-sm text-stone-300">
+      <p className="text-center text-sm text-stone-400">
         Not a citizen yet?{" "}
-        <Link href="/register" className="text-gold-300 underline underline-offset-4">
+        <Link
+          href="/register"
+          className="text-gold-300 underline underline-offset-4 hover:text-gold-400"
+        >
           Become a Citizen
         </Link>
       </p>
