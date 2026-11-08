@@ -10,11 +10,11 @@ export function buttonStyles({
   size = "md",
 }: { variant?: Variant; size?: Size } = {}) {
   return cx(
-    "inline-flex items-center justify-center gap-2 font-sans select-none transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex max-w-full items-center justify-center gap-2 text-center leading-tight font-sans select-none transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50",
     "border-2 uppercase tracking-wider font-semibold",
     size === "md"
-      ? "min-h-[48px] px-4 py-2.5 text-xs sm:text-sm"
-      : "min-h-[52px] px-6 py-3.5 text-sm sm:text-base font-bold",
+      ? "min-h-11 px-4 py-2 text-xs sm:text-[13px]"
+      : "min-h-12 px-6 py-3 text-[13px] sm:text-sm font-bold",
     variant === "primary" &&
       "border-gold-300 bg-gradient-to-b from-gold-300 via-gold-500 to-gold-600 text-canvas-base shadow-[0_3px_0_0_#6b4e18] hover:brightness-105 active:translate-y-0.5 active:shadow-none",
     variant === "secondary" &&

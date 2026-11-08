@@ -1,46 +1,55 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useAuth } from "./auth/auth-provider";
 import { Emblem } from "./emblem";
 import { Button, buttonStyles } from "./ui/button";
 import { cx } from "@/lib/cx";
 
+// Only anchors that exist on the landing page
 const NAV = [
+  { href: "/#chapter", label: "Chapter" },
   { href: "/#world", label: "World" },
   { href: "/#kingdom", label: "Kingdom" },
-  { href: "/#government", label: "Government" },
-  { href: "/#participate", label: "Community" },
-  { href: "/#announcements", label: "Announcements" },
+  { href: "/#announcements", label: "Proclamations" },
+  { href: "/#participate", label: "Enlist" },
 ];
 
 export function SiteHeader() {
   const { status, me, logout } = useAuth();
   const router = useRouter();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  // Close the drawer on navigation and on Escape
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   async function handleLogout() {
+    setOpen(false);
     await logout();
     router.push("/");
   }
 
+  const authed = status === "authenticated" && me;
+
   return (
-    <header className="sticky top-0 z-20 border-b border-canvas-border bg-canvas-surface/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2.5">
-            <Emblem className="h-8 w-8 transition-transform hover:scale-105" />
-            <span className="font-display text-base tracking-widest text-parchment-50 sm:text-lg">
-              DRAGONHOLD
-            </span>
-          </Link>
-          <span className="hidden items-center gap-1.5 rounded border border-gold-sovereign/30 bg-canvas-base px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-gold-300 lg:inline-flex">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gold-sovereign" />
-            Era I · Post-Dragon War
+    <header className="sticky top-0 z-40 w-full border-b border-gold-sovereign/20 bg-canvas-base/95 backdrop-blur-md">
+      <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-2 px-4">
+        {/* Brand: may shrink (truncate), never pushes the controls out */}
+        <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="Dragonhold home">
+          <Emblem className="h-7 w-7 shrink-0" />
+          <span className="truncate font-display text-[15px] tracking-[0.18em] text-parchment-50 sm:text-lg">
+            DRAGONHOLD
           </span>
-        </div>
+        </Link>
 
         {/* Desktop navigation */}
         <nav aria-label="Main" className="hidden items-center gap-6 md:flex">
@@ -55,108 +64,113 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        {/* User actions & mobile menu button */}
-        <div className="flex min-h-12 items-center gap-2">
-          {status === "authenticated" && me ? (
-            <>
-              <Link
-                href="/dashboard"
-                className="hidden max-w-40 truncate text-sm font-medium text-stone-300 transition-colors hover:text-gold-300 sm:inline"
-              >
-                {me.citizen?.characterName ?? me.user.username}
-              </Link>
-              <Button
-                variant="secondary"
-                onClick={handleLogout}
-                className="text-xs sm:text-sm"
-              >
-                Sign out
-              </Button>
-            </>
-          ) : status === "anonymous" ? (
-            <>
-              <Link
-                href="/login"
-                className={cx(
-                  buttonStyles({ variant: "ghost" }),
-                  "px-3 text-xs sm:text-sm",
-                )}
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/register"
-                className={cx(
-                  buttonStyles(),
-                  "px-3.5 text-xs sm:px-4 sm:text-sm",
-                )}
-              >
-                Become Citizen
-              </Link>
-            </>
-          ) : null}
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Desktop auth actions; on mobile these live in the drawer */}
+          <div className="hidden items-center gap-2 md:flex">
+            {authed ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="max-w-40 truncate text-sm font-medium text-stone-300 hover:text-gold-300"
+                >
+                  {me.citizen?.characterName ?? me.user.username}
+                </Link>
+                <Button variant="secondary" onClick={handleLogout}>
+                  Sign out
+                </Button>
+              </>
+            ) : status === "anonymous" ? (
+              <>
+                <Link href="/login" className={buttonStyles({ variant: "ghost" })}>
+                  Sign in
+                </Link>
+                <Link href="/register" className={buttonStyles()}>
+                  Enter the Kingdom
+                </Link>
+              </>
+            ) : null}
+          </div>
 
-          {/* Mobile hamburger button with strict 48px touch hitbox */}
+          {/* Menu toggle: fixed square, icon can never wrap or shrink */}
           <button
             type="button"
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            aria-label="Toggle navigation menu"
-            aria-expanded={mobileMenuOpen}
-            className="flex h-12 w-12 items-center justify-center rounded border border-canvas-border text-stone-300 transition-colors hover:border-gold-sovereign hover:text-gold-300 md:hidden"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            className="flex h-11 w-11 shrink-0 items-center justify-center border border-gold-sovereign/40 bg-canvas-surface text-gold-300 transition-colors hover:border-gold-sovereign active:bg-canvas-subtle md:hidden"
           >
-            {mobileMenuOpen ? (
-              <svg
-                className="h-6 w-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="h-6 w-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            )}
+            <svg
+              className="block h-5 w-5 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+            </svg>
           </button>
         </div>
       </div>
 
-      {/* Mobile navigation drawer */}
-      {mobileMenuOpen ? (
-        <nav
-          aria-label="Mobile Navigation"
-          className="border-t border-canvas-border bg-canvas-base/98 px-4 py-4 md:hidden shadow-2xl backdrop-blur-md"
+      {/* Mobile drawer */}
+      {open ? (
+        <div
+          id="mobile-menu"
+          className="absolute inset-x-0 top-full max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b border-gold-sovereign/30 bg-canvas-base shadow-2xl md:hidden"
         >
-          <ul className="space-y-1">
-            {NAV.map((item) => (
-              <li key={item.href}>
+          <nav aria-label="Mobile" className="px-4 pt-2">
+            <ul>
+              {NAV.map((item) => (
+                <li key={item.href} className="border-b border-gold-sovereign/15 last:border-b-0">
+                  <Link
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="flex min-h-12 items-center justify-between font-display text-sm uppercase tracking-widest text-stone-200 hover:text-gold-300"
+                  >
+                    {item.label}
+                    <span aria-hidden className="text-gold-sovereign/60">›</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="flex flex-col gap-3 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4">
+            {authed ? (
+              <>
                 <Link
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex min-h-[48px] items-center text-sm font-medium text-stone-200 hover:text-gold-300"
+                  href="/dashboard"
+                  onClick={() => setOpen(false)}
+                  className={cx(buttonStyles(), "w-full")}
                 >
-                  {item.label}
+                  Kingdom Hall
                 </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+                <Button variant="secondary" onClick={handleLogout} className="w-full">
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/register"
+                  onClick={() => setOpen(false)}
+                  className={cx(buttonStyles(), "w-full")}
+                >
+                  Enter the Kingdom
+                </Link>
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className={cx(buttonStyles({ variant: "secondary" }), "w-full")}
+                >
+                  Sign in
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
       ) : null}
     </header>
   );

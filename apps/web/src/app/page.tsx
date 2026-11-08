@@ -72,7 +72,7 @@ export default async function HomePage() {
   return (
     <div className="pb-28 sm:pb-0">
       {/* SECTION 1: CINEMATIC HERO — THE GATES OF DRAGONHOLD */}
-      <section className="relative min-h-[92vh] sm:min-h-[88vh] flex flex-col justify-end overflow-hidden border-b border-canvas-border">
+      <section className="relative min-h-[calc(100svh-3.5rem)] sm:min-h-[88vh] flex flex-col justify-end overflow-hidden border-b border-canvas-border">
         {/* Background Artwork Layer */}
         <div className="absolute inset-0 z-0">
           <img
@@ -97,12 +97,12 @@ export default async function HomePage() {
             <Emblem className="h-16 w-16 sm:h-20 sm:w-20 drop-shadow-md" />
           </div>
 
-          <div className="inline-flex items-center gap-2 rounded border border-gold-sovereign/40 bg-canvas-base/90 px-3.5 py-1 font-mono text-[11px] uppercase tracking-widest text-gold-300 backdrop-blur-sm shadow-sm">
+          <div className="inline-flex max-w-full items-center gap-2 border border-gold-sovereign/40 bg-canvas-base/90 px-3 py-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider sm:tracking-widest text-gold-300 backdrop-blur-sm shadow-sm">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gold-sovereign" />
             <span>AETHERIAL REALM · ERA I</span>
           </div>
 
-          <h1 className="mt-4 text-4xl sm:text-6xl md:text-7xl font-display tracking-widest text-parchment-50 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+          <h1 className="mt-4 text-[2rem] min-[360px]:text-4xl sm:text-6xl md:text-7xl font-display tracking-[0.12em] sm:tracking-widest text-parchment-50 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
             DRAGONHOLD
           </h1>
 
@@ -137,20 +137,20 @@ export default async function HomePage() {
           </div>
 
           {/* Canonical 3-Stat Realm HUD */}
-          <div className="mt-10 grid w-full max-w-lg grid-cols-3 gap-2 border border-canvas-border bg-canvas-base/90 p-2 sm:p-3 text-center text-xs backdrop-blur-md shadow-2xl">
-            <div className="border-r border-canvas-border p-1.5 sm:p-2">
+          <div className="mt-10 grid w-full max-w-lg grid-cols-3 divide-x divide-canvas-border border border-canvas-border bg-canvas-base/90 p-1 sm:p-3 text-center text-xs backdrop-blur-md shadow-2xl">
+            <div className="min-w-0 p-2">
               <p className="font-mono text-[10px] uppercase tracking-wider text-stone-400">Throne</p>
-              <p className="mt-0.5 font-sans font-bold text-amber-400 sm:text-sm">VACANT</p>
+              <p className="mt-0.5 break-words font-sans text-[11px] font-bold leading-tight text-amber-400 sm:text-sm">VACANT</p>
               <p className="hidden text-[9px] text-stone-500 sm:block">Interregnum</p>
             </div>
-            <div className="border-r border-canvas-border p-1.5 sm:p-2">
+            <div className="min-w-0 p-2">
               <p className="font-mono text-[10px] uppercase tracking-wider text-stone-400">Status</p>
-              <p className="mt-0.5 font-sans font-bold text-emerald-400 sm:text-sm">NEWLY ESTABLISHED</p>
+              <p className="mt-0.5 break-words font-sans text-[11px] font-bold leading-tight text-emerald-400 sm:text-sm">NEWLY ESTABLISHED</p>
               <p className="hidden text-[9px] text-stone-500 sm:block">Post-War</p>
             </div>
-            <div className="p-1.5 sm:p-2">
+            <div className="min-w-0 p-2">
               <p className="font-mono text-[10px] uppercase tracking-wider text-stone-400">Chronicles</p>
-              <p className="mt-0.5 font-sans font-bold text-gold-300 sm:text-sm">BLANK</p>
+              <p className="mt-0.5 break-words font-sans text-[11px] font-bold leading-tight text-gold-300 sm:text-sm">BLANK</p>
               <p className="hidden text-[9px] text-stone-500 sm:block">Unwritten</p>
             </div>
           </div>
@@ -172,7 +172,7 @@ export default async function HomePage() {
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-canvas-base via-transparent to-transparent opacity-80" />
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs font-mono text-gold-300">
-                <span className="bg-canvas-base/80 px-2 py-1 border border-gold-sovereign/40">CHAPTER COVER · ARTWORK</span>
+                <span className="hidden sm:inline bg-canvas-base/80 px-2 py-1 border border-gold-sovereign/40">CHAPTER COVER</span>
                 <span className="bg-canvas-base/80 px-2 py-1 border border-gold-sovereign/40">EPISODE 001</span>
               </div>
             </div>
@@ -299,25 +299,27 @@ export default async function HomePage() {
         </div>
       </Section>
 
-      {/* SECTION 5: BECOME PART OF THE CHRONICLE — CEREMONIAL INVITATION */}
-      <section id="participate" className="scroll-mt-20 border-t border-canvas-border py-16 sm:py-24 bg-gradient-to-b from-canvas-surface to-canvas-base">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-gold-400">
-            <span>ROYAL CARTULARY ENLISTMENT</span>
+      {/* SECTION 5: BECOME PART OF THE CHRONICLE — sealed invitation */}
+      <section id="participate" className="scroll-mt-20 border-t border-canvas-border bg-gradient-to-b from-canvas-surface to-canvas-base px-4 py-16 sm:py-24">
+        <div className="parchment-sheet relative mx-auto max-w-3xl px-5 py-10 text-center sm:px-12 sm:py-14">
+          <div
+            aria-hidden
+            className="wax-seal absolute -top-6 left-1/2 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full text-parchment-50"
+          >
+            <span className="font-display text-base font-bold">DH</span>
           </div>
-
-          <h2 className="mt-3 text-3xl sm:text-5xl font-display tracking-widest text-parchment-50">
+          <p className="mt-2 font-mono text-[11px] uppercase tracking-widest text-[#633f19]">
+            An invitation from the Creator
+          </p>
+          <h2 className="mt-3 font-display text-2xl tracking-wider text-[#1f1d1a] sm:text-4xl">
             Become Part of the Chronicle
           </h2>
-
-          <p className="mt-4 max-w-2xl mx-auto font-serif text-base sm:text-lg leading-relaxed text-stone-300">
-            Registration in Dragonhold is not merely creating an account. It is entering the world of Aetherial and taking an oath of citizenship.
+          <p className="mx-auto mt-4 max-w-xl font-serif text-base leading-relaxed text-[#2c2825] sm:text-lg">
+            Registering is not creating an account. It is entering Aetherial and taking your place in Dragonhold&apos;s history.
           </p>
-
-          <p className="mt-2 text-sm text-stone-400">
-            Upon entering, an indelible Citizen ID (<span className="font-mono text-gold-300 font-bold">DH-000001</span> format) is sealed to your name.
+          <p className="mt-3 text-sm text-[#4a453e]">
+            A Citizen ID in the form <span className="font-mono font-bold text-[#402d00]">DH-000001</span> is sealed to your name.
           </p>
-
           <div className="mt-8 flex justify-center">
             <CtaButtons />
           </div>

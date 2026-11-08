@@ -114,7 +114,7 @@ export function RegisterForm() {
         onChange={update("confirmPassword")}
         error={errors.confirmPassword}
       />
-      <div className="relative rounded border border-gold-sovereign/40 bg-canvas-base/80 p-3 shadow-inner">
+      <div className="relative border border-gold-sovereign/40 bg-canvas-base/80 p-3">
         <Field
           label="Closed Beta Access Code"
           name="betaCode"
