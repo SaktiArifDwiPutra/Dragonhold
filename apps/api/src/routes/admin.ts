@@ -5,6 +5,7 @@ import { z } from "zod";
 import { validate } from "../lib/validate";
 import { requireAuth, requireRole } from "../middleware/auth";
 import type { AppEnv } from "../types";
+import { adminVotingRoutes } from "./admin-voting";
 
 export const adminUsersQuerySchema = z.object({
   page: z.coerce.number().int().min(1).max(10000).default(1),
@@ -35,6 +36,8 @@ export const adminRoutes = new Hono<AppEnv>();
 
 // Every admin route requires a valid session and an explicit ADMIN or SUPER_ADMIN role
 adminRoutes.use("*", requireAuth, requireRole("ADMIN", "SUPER_ADMIN"));
+
+adminRoutes.route("/voting", adminVotingRoutes);
 
 adminRoutes.get("/overview", async (c) => {
   const db = c.get("db");
@@ -181,4 +184,3 @@ adminRoutes.get("/users", validate("query", adminUsersQuerySchema), async (c) =>
     },
   });
 });
-

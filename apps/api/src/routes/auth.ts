@@ -96,6 +96,7 @@ authRoutes.get("/me", requireAuth, (c) => {
           id: a.citizenId,
           citizenCode: a.citizenCode,
           characterName: a.characterName,
+          status: a.citizenStatus ?? "ACTIVE",
         }
       : null,
   });

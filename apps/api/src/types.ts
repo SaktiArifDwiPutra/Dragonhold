@@ -17,6 +17,7 @@ export type AuthContext = {
   citizenId: string | null;
   citizenCode: string | null;
   characterName: string | null;
+  citizenStatus?: "ACTIVE" | "INACTIVE" | "SUSPENDED" | null;
 };
 
 export type AppEnv = {

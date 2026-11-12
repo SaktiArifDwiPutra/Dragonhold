@@ -24,3 +24,21 @@ export const announcementStatus = pgEnum("announcement_status", [
   "PUBLISHED",
   "ARCHIVED",
 ]);
+
+export const pollType = pgEnum("poll_type", [
+  "LEADERSHIP_ELECTION",
+  "KINGDOM_DECISION",
+]);
+
+export const pollStatus = pgEnum("poll_status", [
+  "DRAFT",
+  "ACTIVE",
+  "CLOSED",
+  "CANCELLED",
+]);
+
+export const pollResultsVisibility = pgEnum("poll_results_visibility", [
+  "HIDDEN",
+  "PUBLISHED",
+  "ARCHIVED",
+]);

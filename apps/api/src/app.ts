@@ -13,6 +13,7 @@ import {
 import { adminRoutes } from "./routes/admin";
 import { announcementRoutes } from "./routes/announcements";
 import { authRoutes } from "./routes/auth";
+import { votingRoutes } from "./routes/voting";
 import type { AppConfig, AppEnv } from "./types";
 
 export function createApp(db: Database, config: AppConfig) {
@@ -66,6 +67,7 @@ export function createApp(db: Database, config: AppConfig) {
 
   app.route("/auth", authRoutes);
   app.route("/announcements", announcementRoutes);
+  app.route("/voting", votingRoutes);
   app.route("/admin", adminRoutes);
 
   app.notFound((c) =>
