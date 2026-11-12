@@ -17,8 +17,6 @@ export const envSchema = z.object({
   VERCEL_BRANCH_URL: z.string().optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   TRUSTED_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(0),
-  REGISTRATION_MODE: z.enum(["closed_beta", "open"]).default("open"),
-  BETA_ACCESS_CODE: z.string().optional(),
   COOKIE_DOMAIN: z.string().optional(),
 });
 

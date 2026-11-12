@@ -14,7 +14,6 @@ function createCorsApp(webOrigins = ["https://dragonhold.my.id", "http://localho
     webOrigins,
     isProd: true,
     trustedProxyHops: 1,
-    registrationMode: "closed_beta",
     cookieDomain: ".dragonhold.my.id",
   };
   const mockDb = {

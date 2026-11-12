@@ -28,7 +28,6 @@ export function SiteFooter() {
             <li><Link href="/#world" className={linkClass}>The World</Link></li>
             <li><Link href="/#kingdom" className={linkClass}>The Kingdom</Link></li>
             <li><Link href="/login" className={linkClass}>Sign in</Link></li>
-            <li><Link href="/register" className={linkClass}>Enter the Kingdom</Link></li>
           </ul>
         </nav>
 

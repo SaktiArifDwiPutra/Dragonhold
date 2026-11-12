@@ -10,6 +10,7 @@ import {
   normalizeOriginList,
   originGuard,
 } from "./middleware/origin-guard";
+import { adminRoutes } from "./routes/admin";
 import { announcementRoutes } from "./routes/announcements";
 import { authRoutes } from "./routes/auth";
 import type { AppConfig, AppEnv } from "./types";
@@ -65,6 +66,7 @@ export function createApp(db: Database, config: AppConfig) {
 
   app.route("/auth", authRoutes);
   app.route("/announcements", announcementRoutes);
+  app.route("/admin", adminRoutes);
 
   app.notFound((c) =>
     c.json({ error: { code: "NOT_FOUND", message: "Endpoint tidak ditemukan." } }, 404),

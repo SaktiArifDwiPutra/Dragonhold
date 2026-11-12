@@ -8,7 +8,6 @@ function createMockApp(dbMock: any) {
     webOrigins: ["http://localhost:3000"],
     isProd: false,
     trustedProxyHops: 0,
-    registrationMode: "closed_beta",
   };
   return createApp(dbMock, config);
 }

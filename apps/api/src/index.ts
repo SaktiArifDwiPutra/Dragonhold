@@ -9,8 +9,6 @@ const app = createApp(db, {
   webOrigins: resolveWebOrigins(env),
   isProd: env.NODE_ENV === "production",
   trustedProxyHops: env.TRUSTED_PROXY_HOPS,
-  registrationMode: env.REGISTRATION_MODE,
-  betaAccessCode: env.BETA_ACCESS_CODE,
   cookieDomain: env.COOKIE_DOMAIN,
 });
 

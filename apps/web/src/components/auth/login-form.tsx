@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { loginSchema } from "@dragonhold/shared";
@@ -77,15 +76,6 @@ export function LoginForm() {
       <Button type="submit" disabled={submitting} className="w-full">
         {submitting ? "Verifying Credentials…" : "Enter the Realm"}
       </Button>
-      <p className="text-center text-sm text-stone-400">
-        Not a citizen yet?{" "}
-        <Link
-          href="/register"
-          className="text-gold-300 underline underline-offset-4 hover:text-gold-400"
-        >
-          Become a Citizen
-        </Link>
-      </p>
     </form>
   );
 }

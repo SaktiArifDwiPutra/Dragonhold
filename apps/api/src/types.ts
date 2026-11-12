@@ -4,8 +4,6 @@ export type AppConfig = {
   webOrigins: string[];
   isProd: boolean;
   trustedProxyHops: number;
-  registrationMode: "closed_beta" | "open";
-  betaAccessCode?: string;
   cookieDomain?: string;
   basePath?: string;
 };

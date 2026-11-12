@@ -78,6 +78,11 @@ export default function DashboardPage() {
             Welcome, {me.citizen?.characterName ?? me.user.username}
           </h1>
           <div className="mt-6 flex flex-wrap gap-3">
+            {me.user.role === "ADMIN" || me.user.role === "SUPER_ADMIN" ? (
+              <Link href="/admin" className={buttonStyles()}>
+                Admin Console
+              </Link>
+            ) : null}
             <Link href="/" className={buttonStyles({ variant: "secondary" })}>
               Return to Realm
             </Link>
