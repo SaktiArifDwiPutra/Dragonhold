@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const schema = z.object({
+export const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   API_PORT: z.coerce.number().int().default(4000),
   PORT: z.coerce.number().int().optional(),
@@ -12,4 +12,12 @@ const schema = z.object({
   COOKIE_DOMAIN: z.string().optional(),
 });
 
-export const env = schema.parse(process.env);
+export function getEnv(raw = process.env) {
+  return envSchema.parse(raw);
+}
+
+export const env = new Proxy({} as z.infer<typeof envSchema>, {
+  get(_target, prop: string) {
+    return getEnv()[prop as keyof z.infer<typeof envSchema>];
+  },
+});

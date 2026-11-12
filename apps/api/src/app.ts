@@ -10,7 +10,9 @@ import { authRoutes } from "./routes/auth";
 import type { AppConfig, AppEnv } from "./types";
 
 export function createApp(db: Database, config: AppConfig) {
-  const app = new Hono<AppEnv>();
+  const app = config.basePath
+    ? new Hono<AppEnv>().basePath(config.basePath)
+    : new Hono<AppEnv>();
 
   app.use(async (c, next) => {
     c.set("db", db);

@@ -7,6 +7,7 @@ export type AppConfig = {
   registrationMode: "closed_beta" | "open";
   betaAccessCode?: string;
   cookieDomain?: string;
+  basePath?: string;
 };
 
 export type AuthContext = {
