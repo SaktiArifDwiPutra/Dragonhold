@@ -1,14 +1,11 @@
 import type { NextConfig } from "next";
-
-const apiUrl = process.env.API_URL ?? "http://localhost:4000";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
-  // package workspace berisi TypeScript mentah, jadi perlu ditranspile oleh Next
-  transpilePackages: ["@dragonhold/shared"],
-  async rewrites() {
-    // Browser hanya bicara ke satu origin; /api/* diteruskan ke Hono
-    return [{ source: "/api/:path*", destination: `${apiUrl}/:path*` }];
-  },
+  // Package workspace berisi TypeScript mentah, ditranspile oleh Next.js
+  transpilePackages: ["@dragonhold/shared", "@dragonhold/api", "@dragonhold/db"],
+  serverExternalPackages: ["@node-rs/argon2"],
+  outputFileTracingRoot: path.resolve(__dirname, "../../"),
 };
 
 export default nextConfig;

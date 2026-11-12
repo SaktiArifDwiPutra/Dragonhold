@@ -9,6 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@dragonhold/api": "workspace:*",
+    "@dragonhold/db": "workspace:*",
     "@dragonhold/shared": "workspace:*",
     "next": "^16.4.5",
     "react": "^19.3.1",

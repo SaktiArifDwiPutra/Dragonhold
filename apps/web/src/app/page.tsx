@@ -117,15 +117,6 @@ export default async function HomePage() {
           {/* Primary & Secondary Call to Actions */}
           <div className="mt-8 flex w-full flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
-              href="/register"
-              className={cx(
-                buttonStyles({ size: "lg" }),
-                "w-full sm:w-auto px-8 text-center text-sm tracking-wider font-bold shadow-xl",
-              )}
-            >
-              Enter the Kingdom
-            </Link>
-            <Link
               href="#chapter"
               className={cx(
                 buttonStyles({ variant: "secondary", size: "lg" }),
@@ -202,12 +193,6 @@ export default async function HomePage() {
                   className={cx(buttonStyles({ variant: "secondary", size: "md" }), "text-xs")}
                 >
                   Read the Proclamations
-                </Link>
-                <Link
-                  href="/register"
-                  className={cx(buttonStyles({ size: "md" }), "text-xs")}
-                >
-                  Join the Chronicle
                 </Link>
               </div>
             </div>
@@ -399,13 +384,13 @@ export default async function HomePage() {
           </div>
         </div>
         <Link
-          href="/register"
+          href="#chapter"
           className={cx(
-            buttonStyles({ size: "md" }),
+            buttonStyles({ variant: "secondary", size: "md" }),
             "px-4 text-xs font-bold shadow-md",
           )}
         >
-          Enter Kingdom
+          Explore the World
         </Link>
       </div>
     </div>

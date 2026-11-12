@@ -61,6 +61,8 @@ const MESSAGES: Record<string, string> = {
   VALIDATION_ERROR: "Please check the highlighted fields.",
   INVALID_BETA_CODE: "Closed beta access code is incorrect.",
   REGISTRATION_UNAVAILABLE: "Closed beta registration is currently closed.",
+  REGISTRATION_DISABLED: "Public registration is currently closed.",
+  FORBIDDEN: "You do not have permission to access this resource.",
   BAD_ORIGIN: "Request rejected: unauthorized origin.",
 };
 

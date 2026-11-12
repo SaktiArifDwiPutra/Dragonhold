@@ -1,104 +1,74 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { hash } from "@node-rs/argon2";
 import { createApp } from "../app";
 import type { AppConfig } from "../types";
 
-function createTestApp(configOverrides: Partial<AppConfig> = {}) {
+const TEST_PASSWORD = "strongpassword123";
+const TEST_PASSWORD_HASH = await hash(TEST_PASSWORD);
+
+function createAuthTestApp(options: { onInsertCalled?: () => void } = {}) {
   const config: AppConfig = {
     webOrigins: ["http://localhost:3000"],
     isProd: false,
     trustedProxyHops: 0,
-    registrationMode: "closed_beta",
-    betaAccessCode: "SECRET-DRAGON-2026",
-    ...configOverrides,
   };
 
-  // Mock database
+  let selectCall = 0;
+
   const mockDb = {
-    execute: async () => [{ n: "2" }],
-    transaction: async (cb: any) => {
-      const tx = {
-        insert: () => ({
-          values: (vals: any) => ({
-            returning: () => [
+    select: () => ({
+      from: () => ({
+        where: () => ({
+          limit: async () => {
+            selectCall += 1;
+            if (selectCall === 1) {
+              return [
+                {
+                  id: "user-admin-1",
+                  username: "archdragon",
+                  email: "archdragon@dragonhold.realm",
+                  passwordHash: TEST_PASSWORD_HASH,
+                  role: "SUPER_ADMIN",
+                  status: "ACTIVE",
+                },
+              ];
+            }
+            return [
               {
-                id: "test-user-id",
-                username: vals.username ?? "citizen_one",
-                citizenCode: vals.citizenCode ?? "DH-000002",
-                characterName: vals.characterName ?? vals.username ?? "citizen_one",
+                id: "citizen-1",
+                citizenCode: "DH-000001",
+                characterName: "The Creator",
               },
-            ],
-          }),
+            ];
+          },
         }),
-        execute: async () => [{ n: "2" }],
-      };
-      return cb(tx);
+      }),
+    }),
+    transaction: async () => {
+      options.onInsertCalled?.();
+      throw new Error("Transaction should never be called when registration is disabled");
     },
     insert: () => ({
-      values: () => Promise.resolve(),
+      values: async () => {
+        options.onInsertCalled?.();
+      },
     }),
     delete: () => ({
-      where: () => Promise.resolve(),
+      where: async () => {},
     }),
   } as any;
 
   return createApp(mockDb, config);
 }
 
-test("Closed beta: fails closed (503) if BETA_ACCESS_CODE is not configured", async () => {
-  const app = createTestApp({ betaAccessCode: undefined });
-
-  const res = await app.request("/auth/register", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Origin: "http://localhost:3000",
+test("POST /auth/register: rejects public registration with 403 REGISTRATION_DISABLED and does not create accounts", async () => {
+  let dbMutated = false;
+  const app = createAuthTestApp({
+    onInsertCalled: () => {
+      dbMutated = true;
     },
-    body: JSON.stringify({
-      username: "citizen_new",
-      email: "citizen@example.com",
-      password: "strongpassword123",
-      confirmPassword: "strongpassword123",
-      betaCode: "ANY-CODE",
-    }),
   });
-
-  assert.equal(res.status, 503);
-  const body = await res.json();
-  assert.equal(body.error.code, "REGISTRATION_UNAVAILABLE");
-  assert.equal(body.error.message, "Pendaftaran closed beta sedang ditutup.");
-  // Pastikan tidak ada rahasia yang bocor
-  assert.equal(JSON.stringify(body).includes("SECRET"), false);
-});
-
-test("Closed beta: rejects invalid beta access code with 403", async () => {
-  const app = createTestApp();
-
-  const res = await app.request("/auth/register", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Origin: "http://localhost:3000",
-    },
-    body: JSON.stringify({
-      username: "citizen_new",
-      email: "citizen@example.com",
-      password: "strongpassword123",
-      confirmPassword: "strongpassword123",
-      betaCode: "WRONG-CODE",
-    }),
-  });
-
-  assert.equal(res.status, 403);
-  const body = await res.json();
-  assert.equal(body.error.code, "INVALID_BETA_CODE");
-  assert.equal(body.error.message, "Kode akses closed beta tidak valid.");
-  // Pastikan kode yang benar tidak bocor di response
-  assert.equal(JSON.stringify(body).includes("SECRET-DRAGON-2026"), false);
-});
-
-test("Closed beta: rejects registration when beta code is omitted with 403", async () => {
-  const app = createTestApp();
 
   const res = await app.request("/auth/register", {
     method: "POST",
@@ -116,57 +86,31 @@ test("Closed beta: rejects registration when beta code is omitted with 403", asy
 
   assert.equal(res.status, 403);
   const body = await res.json();
-  assert.equal(body.error.code, "INVALID_BETA_CODE");
+  assert.equal(body.error.code, "REGISTRATION_DISABLED");
+  assert.equal(dbMutated, false);
 });
 
-test("Closed beta: allows registration with valid beta code (case-insensitive)", async () => {
-  const app = createTestApp();
+test("POST /auth/login: existing user login still succeeds and issues session cookie", async () => {
+  const app = createAuthTestApp();
 
-  const res = await app.request("/auth/register", {
+  const res = await app.request("/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Origin: "http://localhost:3000",
     },
     body: JSON.stringify({
-      username: "citizen_valid",
-      email: "valid@example.com",
-      password: "strongpassword123",
-      confirmPassword: "strongpassword123",
-      betaCode: "secret-dragon-2026", // Huruf kecil tetap valid
+      email: "archdragon@dragonhold.realm",
+      password: TEST_PASSWORD,
     }),
   });
 
-  assert.equal(res.status, 201);
+  assert.equal(res.status, 200);
   const body = await res.json();
-  assert.equal(body.user.username, "citizen_valid");
-  // Pastikan cookie sesi diset
+  assert.equal(body.user.username, "archdragon");
+  assert.equal(body.user.role, "SUPER_ADMIN");
+  assert.equal(body.citizen.citizenCode, "DH-000001");
   const setCookie = res.headers.get("set-cookie");
   assert.ok(setCookie);
   assert.ok(setCookie.includes("dh_session="));
-});
-
-test("Open mode: allows registration without beta code", async () => {
-  const app = createTestApp({
-    registrationMode: "open",
-    betaAccessCode: undefined,
-  });
-
-  const res = await app.request("/auth/register", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Origin: "http://localhost:3000",
-    },
-    body: JSON.stringify({
-      username: "citizen_open",
-      email: "open@example.com",
-      password: "strongpassword123",
-      confirmPassword: "strongpassword123",
-    }),
-  });
-
-  assert.equal(res.status, 201);
-  const body = await res.json();
-  assert.equal(body.user.username, "citizen_open");
 });

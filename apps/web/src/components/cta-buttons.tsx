@@ -19,10 +19,10 @@ export function CtaButtons({ showDiscover = false }: { showDiscover?: boolean })
         </Link>
       ) : (
         <Link
-          href="/register"
-          className={cx(buttonStyles({ size: "lg" }), "w-full sm:w-auto text-center")}
+          href="/login"
+          className={cx(buttonStyles({ variant: "secondary", size: "lg" }), "w-full sm:w-auto text-center")}
         >
-          Enter the Kingdom
+          Sign in
         </Link>
       )}
       {showDiscover ? (

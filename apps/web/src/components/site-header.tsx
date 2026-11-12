@@ -39,6 +39,8 @@ export function SiteHeader() {
   }
 
   const authed = status === "authenticated" && me;
+  const isAdmin =
+    authed && (me.user.role === "ADMIN" || me.user.role === "SUPER_ADMIN");
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gold-sovereign/20 bg-canvas-base/95 backdrop-blur-md">
@@ -69,6 +71,14 @@ export function SiteHeader() {
           <div className="hidden items-center gap-2 md:flex">
             {authed ? (
               <>
+                {isAdmin ? (
+                  <Link
+                    href="/admin"
+                    className="font-mono text-xs uppercase tracking-wider text-gold-300 hover:text-gold-400"
+                  >
+                    Admin
+                  </Link>
+                ) : null}
                 <Link
                   href="/dashboard"
                   className="max-w-40 truncate text-sm font-medium text-stone-300 hover:text-gold-300"
@@ -80,14 +90,9 @@ export function SiteHeader() {
                 </Button>
               </>
             ) : status === "anonymous" ? (
-              <>
-                <Link href="/login" className={buttonStyles({ variant: "ghost" })}>
-                  Sign in
-                </Link>
-                <Link href="/register" className={buttonStyles()}>
-                  Enter the Kingdom
-                </Link>
-              </>
+              <Link href="/login" className={buttonStyles({ variant: "secondary" })}>
+                Sign in
+              </Link>
             ) : null}
           </div>
 
@@ -140,10 +145,22 @@ export function SiteHeader() {
           <div className="flex flex-col gap-3 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4">
             {authed ? (
               <>
+                {isAdmin ? (
+                  <Link
+                    href="/admin"
+                    onClick={() => setOpen(false)}
+                    className={cx(buttonStyles(), "w-full")}
+                  >
+                    Admin Console
+                  </Link>
+                ) : null}
                 <Link
                   href="/dashboard"
                   onClick={() => setOpen(false)}
-                  className={cx(buttonStyles(), "w-full")}
+                  className={cx(
+                    buttonStyles({ variant: isAdmin ? "secondary" : "primary" }),
+                    "w-full",
+                  )}
                 >
                   Kingdom Hall
                 </Link>
@@ -152,22 +169,13 @@ export function SiteHeader() {
                 </Button>
               </>
             ) : (
-              <>
-                <Link
-                  href="/register"
-                  onClick={() => setOpen(false)}
-                  className={cx(buttonStyles(), "w-full")}
-                >
-                  Enter the Kingdom
-                </Link>
-                <Link
-                  href="/login"
-                  onClick={() => setOpen(false)}
-                  className={cx(buttonStyles({ variant: "secondary" }), "w-full")}
-                >
-                  Sign in
-                </Link>
-              </>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className={cx(buttonStyles({ variant: "secondary" }), "w-full")}
+              >
+                Sign in
+              </Link>
             )}
           </div>
         </div>
