@@ -4,19 +4,29 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { HttpError } from "./lib/errors";
-import { originGuard } from "./middleware/origin-guard";
+import {
+  isOriginAllowed,
+  normalizeOrigin,
+  normalizeOriginList,
+  originGuard,
+} from "./middleware/origin-guard";
 import { announcementRoutes } from "./routes/announcements";
 import { authRoutes } from "./routes/auth";
 import type { AppConfig, AppEnv } from "./types";
 
 export function createApp(db: Database, config: AppConfig) {
-  const app = config.basePath
-    ? new Hono<AppEnv>().basePath(config.basePath)
+  const normalizedConfig: AppConfig = {
+    ...config,
+    webOrigins: normalizeOriginList(config.webOrigins),
+  };
+
+  const app = normalizedConfig.basePath
+    ? new Hono<AppEnv>().basePath(normalizedConfig.basePath)
     : new Hono<AppEnv>();
 
   app.use(async (c, next) => {
     c.set("db", db);
-    c.set("config", config);
+    c.set("config", normalizedConfig);
     await next();
   });
 
@@ -26,7 +36,7 @@ export function createApp(db: Database, config: AppConfig) {
       origin: (origin, c) => {
         const allowed = c.get("config").webOrigins;
         if (!origin) return allowed[0] ?? "";
-        return allowed.includes(origin) ? origin : null;
+        return isOriginAllowed(origin, allowed) ? normalizeOrigin(origin) : null;
       },
       credentials: true,
       allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

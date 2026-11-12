@@ -1,5 +1,5 @@
 import { createApp } from "@dragonhold/api";
-import { envSchema } from "@dragonhold/api/env";
+import { envSchema, resolveWebOrigins } from "@dragonhold/api/env";
 import { createDb } from "@dragonhold/db";
 
 export const runtime = "nodejs";
@@ -15,7 +15,7 @@ function getApp() {
 
   cachedApp = createApp(db, {
     basePath: "/api",
-    webOrigins: env.WEB_ORIGIN.split(",").map((s) => s.trim()),
+    webOrigins: resolveWebOrigins(env),
     isProd: env.NODE_ENV === "production",
     trustedProxyHops: env.TRUSTED_PROXY_HOPS,
     registrationMode: env.REGISTRATION_MODE,

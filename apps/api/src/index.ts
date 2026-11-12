@@ -1,12 +1,12 @@
 import { serve } from "@hono/node-server";
 import { createDb } from "@dragonhold/db";
 import { createApp } from "./app";
-import { env } from "./env";
+import { env, resolveWebOrigins } from "./env";
 
 const { db } = createDb(env.DATABASE_URL);
 
 const app = createApp(db, {
-  webOrigins: env.WEB_ORIGIN.split(",").map((s) => s.trim()),
+  webOrigins: resolveWebOrigins(env),
   isProd: env.NODE_ENV === "production",
   trustedProxyHops: env.TRUSTED_PROXY_HOPS,
   registrationMode: env.REGISTRATION_MODE,
