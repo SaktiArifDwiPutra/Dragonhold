@@ -78,8 +78,11 @@ export default function DashboardPage() {
             Welcome, {me.citizen?.characterName ?? me.user.username}
           </h1>
           <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/voting" className={buttonStyles()}>
+              Realm Voting
+            </Link>
             {me.user.role === "ADMIN" || me.user.role === "SUPER_ADMIN" ? (
-              <Link href="/admin" className={buttonStyles()}>
+              <Link href="/admin" className={buttonStyles({ variant: "secondary" })}>
                 Admin Console
               </Link>
             ) : null}

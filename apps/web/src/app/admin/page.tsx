@@ -284,6 +284,9 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
+              <Link href="/admin/voting" className={buttonStyles()}>
+                Voting Management
+              </Link>
               <Button
                 variant="secondary"
                 onClick={handleRefreshAll}
@@ -299,6 +302,21 @@ export default function AdminDashboardPage() {
               </Button>
             </div>
           </div>
+
+          <nav aria-label="Admin sections" className="mt-6 flex flex-wrap gap-2 border-t border-canvas-border pt-4">
+            <Link
+              href="/admin"
+              className="border border-gold-sovereign bg-gold-sovereign/15 px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-gold-300"
+            >
+              Platform Overview
+            </Link>
+            <Link
+              href="/admin/voting"
+              className="border border-canvas-border bg-canvas-base px-4 py-2 font-mono text-xs uppercase tracking-wider text-stone-300 transition-colors hover:border-gold-sovereign/60 hover:text-gold-300"
+            >
+              Voting Management
+            </Link>
+          </nav>
         </div>
       </section>
 
@@ -632,4 +650,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
