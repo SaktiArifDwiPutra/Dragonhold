@@ -23,6 +23,7 @@ export const citizens = pgTable(
       .references(() => users.id, { onDelete: "restrict" }),
     citizenCode: varchar("citizen_code", { length: 16 }).notNull().unique(),
     characterName: varchar("character_name", { length: 64 }).notNull(),
+    avatarUrl: varchar("avatar_url", { length: 512 }),
     biography: text("biography").notNull().default(""),
     joinedAt: timestamp("joined_at", { withTimezone: true })
       .notNull()

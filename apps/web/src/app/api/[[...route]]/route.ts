@@ -21,6 +21,9 @@ function getApp() {
     registrationMode: env.REGISTRATION_MODE,
     betaAccessCode: env.BETA_ACCESS_CODE,
     cookieDomain: env.COOKIE_DOMAIN,
+    googleClientId: env.GOOGLE_CLIENT_ID,
+    googleClientSecret: env.GOOGLE_CLIENT_SECRET,
+    googleRedirectUri: env.GOOGLE_REDIRECT_URI,
   });
 
   return cachedApp;

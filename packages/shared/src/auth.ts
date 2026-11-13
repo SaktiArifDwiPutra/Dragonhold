@@ -32,9 +32,40 @@ export const registerSchema = z
   });
 
 export const loginSchema = z.object({
-  email: emailSchema, 
+  email: emailSchema,
+  password: z.string().min(1, "Password is required.").max(128),
+});
+
+export const displayNameSchema = z
+  .string()
+  .trim()
+  .max(64, "Display name must be at most 64 characters.")
+  .optional()
+  .transform((v) => (v && v.length > 0 ? v : undefined));
+
+export const avatarUrlSchema = z
+  .string()
+  .trim()
+  .max(512, "Avatar URL must be at most 512 characters.")
+  .refine(
+    (v) => v === "" || /^https?:\/\/[^\s]+$/i.test(v),
+    "Enter a valid http:// or https:// image URL.",
+  )
+  .optional()
+  .transform((v) => (v && v.length > 0 ? v : undefined));
+
+export const googleOnboardingSchema = z.object({
+  username: usernameSchema,
+  displayName: displayNameSchema,
+  avatarUrl: avatarUrlSchema,
+});
+
+export const linkExistingAccountSchema = z.object({
+  email: emailSchema,
   password: z.string().min(1, "Password is required.").max(128),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type GoogleOnboardingInput = z.infer<typeof googleOnboardingSchema>;
+export type LinkExistingAccountInput = z.infer<typeof linkExistingAccountSchema>;
