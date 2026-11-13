@@ -27,6 +27,8 @@ export function SiteFooter() {
             <li><Link href="/#chapter" className={linkClass}>Episode 001</Link></li>
             <li><Link href="/#world" className={linkClass}>The World</Link></li>
             <li><Link href="/#kingdom" className={linkClass}>The Kingdom</Link></li>
+            <li><Link href="/voting" className={linkClass}>Realm Voting</Link></li>
+            <li><Link href="/voting/archive" className={linkClass}>Voting Archive</Link></li>
             <li><Link href="/login" className={linkClass}>Sign in</Link></li>
           </ul>
         </nav>

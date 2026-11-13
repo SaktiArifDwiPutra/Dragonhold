@@ -8,13 +8,13 @@ import { Emblem } from "./emblem";
 import { Button, buttonStyles } from "./ui/button";
 import { cx } from "@/lib/cx";
 
-// Only anchors that exist on the landing page
+// Navigation links
 const NAV = [
   { href: "/#chapter", label: "Chapter" },
   { href: "/#world", label: "World" },
   { href: "/#kingdom", label: "Kingdom" },
   { href: "/#announcements", label: "Proclamations" },
-  { href: "/#participate", label: "Enlist" },
+  { href: "/voting", label: "Voting" },
 ];
 
 export function SiteHeader() {

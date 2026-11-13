@@ -4,6 +4,7 @@ export type MeResponse = {
     id: string;
     citizenCode: string | null;
     characterName: string | null;
+    status?: string | null;
   } | null;
 };
 
@@ -63,6 +64,11 @@ const MESSAGES: Record<string, string> = {
   REGISTRATION_UNAVAILABLE: "Closed beta registration is currently closed.",
   REGISTRATION_DISABLED: "Public registration is currently closed.",
   FORBIDDEN: "You do not have permission to access this resource.",
+  ALREADY_VOTED: "Your vote has already been sealed for this voting session.",
+  VOTING_NOT_ACTIVE: "This voting session is not currently open for voting.",
+  CITIZEN_INELIGIBLE: "Only active citizens of Dragonhold may cast a vote.",
+  INVALID_OPTION: "The selected option is invalid for this voting session.",
+  INVALID_POLL_TRANSITION: "This lifecycle action is not allowed in the current voting state.",
   BAD_ORIGIN: "Request rejected: unauthorized origin.",
 };
 
