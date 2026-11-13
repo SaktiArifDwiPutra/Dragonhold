@@ -6,6 +6,7 @@ import { Emblem } from "@/components/emblem";
 import { Button, buttonStyles } from "@/components/ui/button";
 import { api, errorText } from "@/lib/api";
 import { cx } from "@/lib/cx";
+import { useLanguage } from "@/lib/i18n";
 
 type PollType = "LEADERSHIP_ELECTION" | "KINGDOM_DECISION";
 type PollStatus = "DRAFT" | "ACTIVE" | "CLOSED" | "CANCELLED";
@@ -58,11 +59,11 @@ type PublicArchiveResponse = {
   };
 };
 
-function formatDateTime(value: string | null | undefined): string {
+function formatDateTime(value: string | null | undefined, locale: string): string {
   if (!value) return "—";
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleString("en-US", {
+  return d.toLocaleString(locale, {
     year: "numeric",
     month: "short",
     day: "2-digit",
@@ -72,6 +73,7 @@ function formatDateTime(value: string | null | undefined): string {
 }
 
 export default function VotingArchivePage() {
+  const { lang, t } = useLanguage();
   const [typeFilter, setTypeFilter] = useState<"ALL" | PollType>("ALL");
   const [page, setPage] = useState(1);
   const [data, setData] = useState<PublicArchiveResponse | null>(null);
@@ -98,7 +100,7 @@ export default function VotingArchivePage() {
       })
       .catch((err) => {
         if (!active) return;
-        setError(errorText(err));
+        setError(errorText(err, lang));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -107,7 +109,7 @@ export default function VotingArchivePage() {
     return () => {
       active = false;
     };
-  }, [typeFilter, page]);
+  }, [typeFilter, page, lang]);
 
   return (
     <div className="min-h-screen pb-24">
@@ -120,14 +122,12 @@ export default function VotingArchivePage() {
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="eyebrow">Permanent Chronicles of the Realm</p>
+              <p className="eyebrow">{t.votingArchive.eyebrow}</p>
               <h1 className="mt-2 font-display text-3xl uppercase tracking-[0.06em] text-parchment-100 sm:text-5xl">
-                Public Voting Archive
+                {t.votingArchive.title}
               </h1>
               <p className="mt-4 text-sm leading-relaxed text-parchment-300 sm:text-base">
-                The permanent historical record of all officially published and
-                archived Leadership Elections and Kingdom Decisions in
-                Dragonhold.
+                {t.votingArchive.intro}
               </p>
             </div>
             <div>
@@ -135,7 +135,7 @@ export default function VotingArchivePage() {
                 href="/voting"
                 className={cx(buttonStyles({ variant: "secondary", size: "md" }))}
               >
-                ← Back to Active Voting Hall
+                {t.votingArchive.backToHall}
               </Link>
             </div>
           </div>
@@ -144,12 +144,15 @@ export default function VotingArchivePage() {
           <div className="mt-8 flex flex-wrap items-center gap-2">
             {(
               [
-                { key: "ALL", label: "All Historical Records" },
+                { key: "ALL", label: t.votingArchive.tabs.ALL },
                 {
                   key: "LEADERSHIP_ELECTION",
-                  label: "Leadership Elections",
+                  label: t.votingArchive.tabs.LEADERSHIP_ELECTION,
                 },
-                { key: "KINGDOM_DECISION", label: "Kingdom Decisions" },
+                {
+                  key: "KINGDOM_DECISION",
+                  label: t.votingArchive.tabs.KINGDOM_DECISION,
+                },
               ] as const
             ).map((tab) => {
               const active = typeFilter === tab.key;
@@ -181,7 +184,7 @@ export default function VotingArchivePage() {
           <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 text-center">
             <Emblem className="h-12 w-12 animate-pulse" />
             <p className="font-display text-sm uppercase tracking-widest text-gold-300">
-              Consulting Historical Scrolls…
+              {t.votingArchive.loading}
             </p>
           </div>
         ) : error ? (
@@ -194,12 +197,10 @@ export default function VotingArchivePage() {
         ) : !data || data.polls.length === 0 ? (
           <div className="plate-card p-10 text-center">
             <p className="font-display text-lg uppercase tracking-wider text-parchment-200">
-              No Archived Voting Records Found
+              {t.votingArchive.emptyTitle}
             </p>
             <p className="mt-2 text-sm text-parchment-400">
-              Once a voting session is closed and its results are officially
-              published by an administrator, its complete vote distribution is
-              preserved here.
+              {t.votingArchive.emptyBody}
             </p>
           </div>
         ) : (
@@ -211,21 +212,21 @@ export default function VotingArchivePage() {
                     <div className="flex flex-wrap items-center gap-2">
                       {poll.type === "LEADERSHIP_ELECTION" ? (
                         <span className="inline-flex items-center border border-gold-sovereign/40 bg-gold-sovereign/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-gold-300">
-                          Leadership Election
+                          {t.voting.typeElection}
                         </span>
                       ) : (
                         <span className="inline-flex items-center border border-sky-500/40 bg-sky-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-sky-300">
-                          Kingdom Decision
+                          {t.voting.typeDecision}
                         </span>
                       )}
 
                       {poll.resultsVisibility === "PUBLISHED" ? (
                         <span className="inline-flex items-center border border-gold-sovereign/60 bg-gold-sovereign/20 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-gold-200">
-                          Published Announcement
+                          {t.votingArchive.publishedBadge}
                         </span>
                       ) : (
                         <span className="inline-flex items-center border border-purple-400/40 bg-purple-500/15 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-purple-200">
-                          Archived Record
+                          {t.votingArchive.archivedBadge}
                         </span>
                       )}
                     </div>
@@ -246,7 +247,7 @@ export default function VotingArchivePage() {
 
                   <div className="shrink-0 border border-gold-sovereign/25 bg-obsidian-950/75 px-5 py-3 text-left lg:text-right">
                     <p className="font-mono text-[10px] uppercase tracking-wider text-parchment-400">
-                      Total Votes Recorded
+                      {t.votingArchive.totalVotesRecorded}
                     </p>
                     <p className="font-display text-3xl text-gold-300">
                       {poll.results?.totalVotes ?? 0}
@@ -258,31 +259,31 @@ export default function VotingArchivePage() {
                 <dl className="mt-4 grid grid-cols-1 gap-3 border-b border-gold-sovereign/15 pb-4 text-xs sm:grid-cols-3">
                   <div>
                     <dt className="font-mono text-[10px] uppercase tracking-wider text-parchment-400">
-                      Voting Period
+                      {t.votingArchive.votingPeriod}
                     </dt>
                     <dd className="mt-0.5 text-parchment-200">
-                      {formatDateTime(poll.openedAt)} →{" "}
-                      {formatDateTime(poll.closedAt)}
+                      {formatDateTime(poll.openedAt, t.localeCode)} →{" "}
+                      {formatDateTime(poll.closedAt, t.localeCode)}
                     </dd>
                   </div>
                   <div>
                     <dt className="font-mono text-[10px] uppercase tracking-wider text-parchment-400">
-                      Announcement Date
+                      {t.votingArchive.announcementDate}
                     </dt>
                     <dd className="mt-0.5 text-parchment-200">
-                      {formatDateTime(poll.resultsPublishedAt)}
+                      {formatDateTime(poll.resultsPublishedAt, t.localeCode)}
                     </dd>
                   </div>
                   <div className="sm:text-right">
                     <dt className="font-mono text-[10px] uppercase tracking-wider text-parchment-400">
-                      Full Chronicle
+                      {t.votingArchive.fullChronicle}
                     </dt>
                     <dd className="mt-0.5">
                       <Link
                         href={`/voting/${poll.id}`}
                         className="font-mono uppercase tracking-wider text-gold-300 hover:text-gold-200"
                       >
-                        Open Detailed Record →
+                        {t.votingArchive.openDetailedRecord}
                       </Link>
                     </dd>
                   </div>
@@ -292,7 +293,7 @@ export default function VotingArchivePage() {
                 {poll.results && (
                   <div className="mt-5 space-y-3">
                     <p className="font-mono text-[10px] uppercase tracking-wider text-gold-400">
-                      Official Vote Distribution
+                      {t.votingArchive.officialDistribution}
                     </p>
                     <div className="grid gap-3 md:grid-cols-2">
                       {poll.results.options.map((opt, idx) => (
@@ -305,8 +306,11 @@ export default function VotingArchivePage() {
                               {idx + 1}. {opt.label}
                             </span>
                             <span className="font-mono text-xs text-gold-300">
-                              {opt.voteCount} votes ({opt.percentage.toFixed(1)}
-                              %)
+                              {opt.voteCount}{" "}
+                              {opt.voteCount === 1
+                                ? t.voting.voteSingular
+                                : t.voting.votePlural}{" "}
+                              ({opt.percentage.toFixed(1)}%)
                             </span>
                           </div>
                           {opt.shortDescription && (
@@ -334,8 +338,9 @@ export default function VotingArchivePage() {
             {data.pagination.totalPages > 1 && (
               <div className="flex items-center justify-between border-t border-gold-sovereign/20 pt-6">
                 <p className="font-mono text-xs text-parchment-400">
-                  Page {data.pagination.page} of {data.pagination.totalPages} (
-                  {data.pagination.total} records)
+                  {t.votingArchive.pageLabel} {data.pagination.page}{" "}
+                  {t.votingArchive.ofLabel} {data.pagination.totalPages} (
+                  {data.pagination.total})
                 </p>
                 <div className="flex gap-2">
                   <Button
@@ -345,7 +350,7 @@ export default function VotingArchivePage() {
                     disabled={page <= 1}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                   >
-                    Previous
+                    {t.common.previous}
                   </Button>
                   <Button
                     type="button"
@@ -354,7 +359,7 @@ export default function VotingArchivePage() {
                     disabled={page >= data.pagination.totalPages}
                     onClick={() => setPage((p) => p + 1)}
                   >
-                    Next
+                    {t.common.next}
                   </Button>
                 </div>
               </div>

@@ -11,6 +11,7 @@ import { Field } from "@/components/ui/field";
 import { Panel } from "@/components/ui/panel";
 import { ApiError, api, errorText } from "@/lib/api";
 import { cx } from "@/lib/cx";
+import { useLanguage } from "@/lib/i18n";
 
 type PollType = "LEADERSHIP_ELECTION" | "KINGDOM_DECISION";
 type PollStatus = "DRAFT" | "ACTIVE" | "CLOSED" | "CANCELLED";
@@ -117,11 +118,11 @@ type OptionDraft = {
   imageUrl: string;
 };
 
-function formatDateTime(iso: string | null) {
+function formatDateTime(iso: string | null, locale: string) {
   if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleString("en-US", {
+  return d.toLocaleString(locale, {
     year: "numeric",
     month: "short",
     day: "2-digit",
@@ -130,7 +131,15 @@ function formatDateTime(iso: string | null) {
   });
 }
 
-function PollTypeBadge({ type }: { type: PollType }) {
+function PollTypeBadge({
+  type,
+  electionLabel,
+  decisionLabel,
+}: {
+  type: PollType;
+  electionLabel: string;
+  decisionLabel: string;
+}) {
   return (
     <span
       className={cx(
@@ -140,7 +149,7 @@ function PollTypeBadge({ type }: { type: PollType }) {
           : "border-amber-500/50 bg-amber-500/10 text-amber-300",
       )}
     >
-      {type === "LEADERSHIP_ELECTION" ? "Leadership Election" : "Kingdom Decision"}
+      {type === "LEADERSHIP_ELECTION" ? electionLabel : decisionLabel}
     </span>
   );
 }
@@ -183,6 +192,7 @@ function VisibilityBadge({ visibility }: { visibility: PollResultsVisibility }) 
 
 export default function AdminVotingPage() {
   const { status, me, logout } = useAuth();
+  const { lang, t } = useLanguage();
   const router = useRouter();
 
   const isAdmin =
@@ -235,23 +245,26 @@ export default function AdminVotingPage() {
       );
       setListData(res);
     } catch (err) {
-      setError(errorText(err));
+      setError(errorText(err, lang));
     } finally {
       setLoadingList(false);
     }
-  }, [filter, page]);
+  }, [filter, page, lang]);
 
-  const fetchDetail = useCallback(async (pollId: string) => {
-    setLoadingDetail(true);
-    try {
-      const res = await api<AdminPollDetail>(`/admin/voting/${pollId}`);
-      setSelectedDetail(res);
-    } catch (err) {
-      setError(errorText(err));
-    } finally {
-      setLoadingDetail(false);
-    }
-  }, []);
+  const fetchDetail = useCallback(
+    async (pollId: string) => {
+      setLoadingDetail(true);
+      try {
+        const res = await api<AdminPollDetail>(`/admin/voting/${pollId}`);
+        setSelectedDetail(res);
+      } catch (err) {
+        setError(errorText(err, lang));
+      } finally {
+        setLoadingDetail(false);
+      }
+    },
+    [lang],
+  );
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -328,16 +341,20 @@ export default function AdminVotingPage() {
         { label: "", shortDescription: "", details: "", imageUrl: "" },
         { label: "", shortDescription: "", details: "", imageUrl: "" },
       ]);
-      setNotice(`Draft "${created.poll.title}" has been created.`);
+      setNotice(
+        lang === "id"
+          ? `Draf "${created.poll.title}" berhasil dibuat.`
+          : `Draft "${created.poll.title}" has been created.`,
+      );
       setSelectedPollId(created.poll.id);
       setSelectedDetail(created);
       await fetchList();
     } catch (err) {
       if (err instanceof ApiError && err.details) {
         const flat = Object.values(err.details).flat().join(" ");
-        setError(flat || errorText(err));
+        setError(flat || errorText(err, lang));
       } else {
-        setError(errorText(err));
+        setError(errorText(err, lang));
       }
     } finally {
       setSubmittingCreate(false);
@@ -356,11 +373,15 @@ export default function AdminVotingPage() {
         { method: "POST" },
       );
       setSelectedDetail(updated);
-      setNotice(`Action "${pendingAction.label}" completed for "${updated.poll.title}".`);
+      setNotice(
+        lang === "id"
+          ? `Aksi "${pendingAction.label}" selesai untuk "${updated.poll.title}".`
+          : `Action "${pendingAction.label}" completed for "${updated.poll.title}".`,
+      );
       setPendingAction(null);
       await fetchList();
     } catch (err) {
-      setError(errorText(err));
+      setError(errorText(err, lang));
       setPendingAction(null);
     } finally {
       setSubmittingAction(false);
@@ -369,67 +390,47 @@ export default function AdminVotingPage() {
 
   function getAvailableActions(poll: AdminPollDetail["poll"]): LifecycleActionSpec[] {
     const actions: LifecycleActionSpec[] = [];
+    const a = t.admin.voting.actions;
 
     if (poll.status === "DRAFT") {
       actions.push({
         action: "open",
-        label: "Open Voting",
-        confirmTitle: "Open Voting Session",
-        confirmBody:
-          "Opening this voting session makes it visible to eligible citizens and immediately enables vote submission. Options will be locked and cannot be edited after opening.",
+        ...a.open,
         variant: "primary",
       });
       actions.push({
         action: "cancel",
-        label: "Cancel Draft",
-        confirmTitle: "Cancel Voting Draft",
-        confirmBody:
-          "Cancelling this draft permanently marks it as CANCELLED. Historical audit records are preserved.",
+        ...a.cancel,
         variant: "secondary",
       });
     } else if (poll.status === "ACTIVE") {
       actions.push({
         action: "close",
-        label: "Close Voting",
-        confirmTitle: "Close Active Voting",
-        confirmBody:
-          "Closing this voting session permanently stops vote collection and freezes final results. Results will remain HIDDEN from citizens until you manually publish them.",
+        ...a.close,
         variant: "primary",
       });
       actions.push({
         action: "cancel",
-        label: "Cancel Voting",
-        confirmTitle: "Cancel Active Voting",
-        confirmBody:
-          "Cancelling this active session stops vote collection, keeps results hidden, and marks the session as CANCELLED for citizens. Existing records are preserved.",
+        ...a.cancel,
         variant: "secondary",
       });
     } else if (poll.status === "CLOSED") {
       if (poll.resultsVisibility === "HIDDEN") {
         actions.push({
           action: "publish-results",
-          label: "Publish Results",
-          confirmTitle: "Publish Official Results",
-          confirmBody:
-            "Publishing announces the final vote counts and percentages to the public on the Voting page and Archive. This does NOT reopen voting.",
+          ...a["publish-results"],
           variant: "primary",
         });
       } else if (poll.resultsVisibility === "PUBLISHED") {
         actions.push({
           action: "withdraw-results",
-          label: "Withdraw Announcement",
-          confirmTitle: "Withdraw Result Announcement",
-          confirmBody:
-            "Withdrawing changes the publication status to ARCHIVED. The result will be removed from the active announcement area on /voting but will remain publicly accessible in the permanent Voting Archive.",
+          ...a["withdraw-results"],
           variant: "secondary",
         });
       } else if (poll.resultsVisibility === "ARCHIVED") {
         actions.push({
           action: "republish-results",
-          label: "Republish Results",
-          confirmTitle: "Republish Archived Results",
-          confirmBody:
-            "Republishing restores the original final results to the active announcement area on /voting without modifying any vote records.",
+          ...a["republish-results"],
           variant: "primary",
         });
       }
@@ -448,7 +449,7 @@ export default function AdminVotingPage() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
         <Emblem className="h-12 w-12 animate-pulse" />
         <p className="font-display text-sm uppercase tracking-widest text-gold-300">
-          Verifying Sovereign Credentials…
+          {t.admin.verifying}
         </p>
       </div>
     );
@@ -459,20 +460,20 @@ export default function AdminVotingPage() {
       <div className="mx-auto max-w-lg px-4 py-16">
         <Panel variant="hud" brackets className="space-y-4 text-center">
           <p className="font-mono text-xs uppercase tracking-widest text-seal-crimson">
-            HTTP 403 · Access Restricted
+            {t.admin.restrictedCode}
           </p>
           <h1 className="font-display text-2xl text-parchment-50">
-            Authorized Administrators Only
+            {t.admin.restrictedTitle}
           </h1>
           <p className="font-serif text-sm leading-relaxed text-stone-400">
-            Your account does not hold administrative privileges required to manage kingdom voting.
+            {t.admin.restrictedVotingBody}
           </p>
           <div className="flex flex-col justify-center gap-3 pt-2 sm:flex-row">
             <Link href="/dashboard" className={buttonStyles()}>
-              Kingdom Hall
+              {t.common.kingdomHall}
             </Link>
             <Link href="/" className={buttonStyles({ variant: "secondary" })}>
-              Return to Realm
+              {t.common.returnToRealm}
             </Link>
           </div>
         </Panel>
@@ -483,6 +484,7 @@ export default function AdminVotingPage() {
   const stats = listData?.stats;
   const pollsList = listData?.polls ?? [];
   const pagination = listData?.pagination;
+  const vt = t.admin.voting;
 
   return (
     <div className="pb-16">
@@ -492,25 +494,23 @@ export default function AdminVotingPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-mono text-[11px] uppercase tracking-widest text-gold-400">
-                Sovereign Administration · Voting Engine
+                {vt.eyebrow}
               </p>
               <h1 className="mt-2 font-display text-2xl tracking-wider text-parchment-50 sm:text-4xl">
-                Voting & Kingdom Decisions
+                {vt.title}
               </h1>
-              <p className="mt-1 font-mono text-xs text-stone-400">
-                Manual lifecycle control for Leadership Elections and Kingdom Decisions
-              </p>
+              <p className="mt-1 font-mono text-xs text-stone-400">{vt.subtitle}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
               <Button onClick={() => setShowCreateForm((v) => !v)}>
-                {showCreateForm ? "Close Creator" : "+ New Voting Draft"}
+                {showCreateForm ? vt.closeForm : vt.newDraft}
               </Button>
               <Link href="/voting" className={buttonStyles({ variant: "secondary" })}>
-                Public Voting View
+                {vt.publicView}
               </Link>
               <Button variant="ghost" onClick={handleLogout}>
-                Sign out
+                {t.common.signOut}
               </Button>
             </div>
           </div>
@@ -523,13 +523,13 @@ export default function AdminVotingPage() {
               href="/admin"
               className="border border-canvas-border bg-canvas-base px-4 py-2 font-mono text-xs uppercase tracking-wider text-stone-300 transition-colors hover:border-gold-sovereign/60 hover:text-gold-300"
             >
-              Platform Overview
+              {t.admin.platformOverview}
             </Link>
             <Link
               href="/admin/voting"
               className="border border-gold-sovereign bg-gold-sovereign/15 px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-gold-300"
             >
-              Voting Management
+              {t.admin.votingManagement}
             </Link>
           </nav>
         </div>
@@ -546,22 +546,22 @@ export default function AdminVotingPage() {
               id="voting-stats-heading"
               className="font-display text-base uppercase tracking-widest text-gold-300"
             >
-              Voting Overview
+              {vt.overviewHeading}
             </h2>
             <span className="font-mono text-[11px] uppercase tracking-wider text-stone-400">
-              Database Telemetry
+              {vt.telemetry}
             </span>
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
             {[
-              ["Total Sessions", stats?.totalPolls, "text-parchment-50"],
-              ["Drafts", stats?.draftPolls, "text-stone-300"],
-              ["Active", stats?.activePolls, "text-emerald-400"],
-              ["Closed", stats?.closedPolls, "text-amber-300"],
-              ["Published", stats?.publishedResults, "text-gold-300"],
-              ["Archived", stats?.archivedResults, "text-parchment-200"],
-              ["Total Votes", stats?.totalVotesCast, "text-gold-400"],
+              [vt.stats.total, stats?.totalPolls, "text-parchment-50"],
+              [vt.stats.drafts, stats?.draftPolls, "text-stone-300"],
+              [vt.stats.active, stats?.activePolls, "text-emerald-400"],
+              [vt.stats.closed, stats?.closedPolls, "text-amber-300"],
+              [vt.stats.published, stats?.publishedResults, "text-gold-300"],
+              [vt.stats.archived, stats?.archivedResults, "text-parchment-200"],
+              [vt.stats.totalVotes, stats?.totalVotesCast, "text-gold-400"],
             ].map(([label, val, color]) => (
               <Panel key={String(label)} variant="hud" brackets className="p-3.5">
                 <p className="font-mono text-[10px] uppercase tracking-wider text-stone-400">
@@ -582,17 +582,17 @@ export default function AdminVotingPage() {
               <div className="flex items-center justify-between border-b border-canvas-border pb-3">
                 <div>
                   <p className="font-mono text-[11px] uppercase tracking-widest text-gold-400">
-                    New Session Draft
+                    {vt.createEyebrow}
                   </p>
                   <h2
                     id="create-voting-heading"
                     className="mt-1 font-display text-xl text-parchment-50"
                   >
-                    Create Voting Draft
+                    {vt.createTitle}
                   </h2>
                 </div>
                 <Button variant="ghost" onClick={() => setShowCreateForm(false)}>
-                  Cancel
+                  {t.common.cancel}
                 </Button>
               </div>
 
@@ -600,10 +600,10 @@ export default function AdminVotingPage() {
                 <div className="grid gap-4 sm:grid-cols-12">
                   <div className="sm:col-span-8">
                     <Field
-                      label="Voting Title"
+                      label={vt.votingTitleLabel}
                       name="title"
                       required
-                      placeholder="e.g. Election of the First High Sovereign of Dragonhold"
+                      placeholder={vt.votingTitlePlaceholder}
                       value={createTitle}
                       onChange={(e) => setCreateTitle(e.target.value)}
                     />
@@ -613,7 +613,7 @@ export default function AdminVotingPage() {
                       htmlFor="poll-type"
                       className="block text-sm font-medium text-parchment-200"
                     >
-                      Voting Type
+                      {vt.votingTypeLabel}
                     </label>
                     <select
                       id="poll-type"
@@ -621,12 +621,8 @@ export default function AdminVotingPage() {
                       onChange={(e) => setCreateType(e.target.value as PollType)}
                       className="mt-1.5 block min-h-12 w-full border-2 border-canvas-border bg-canvas-base px-3 py-2.5 text-sm text-parchment-50 focus:border-gold-sovereign focus:outline-none"
                     >
-                      <option value="LEADERSHIP_ELECTION">
-                        Leadership Election (Candidates)
-                      </option>
-                      <option value="KINGDOM_DECISION">
-                        Kingdom Decision (Policies / Events)
-                      </option>
+                      <option value="LEADERSHIP_ELECTION">{vt.electionOption}</option>
+                      <option value="KINGDOM_DECISION">{vt.decisionOption}</option>
                     </select>
                   </div>
                 </div>
@@ -636,7 +632,7 @@ export default function AdminVotingPage() {
                     htmlFor="poll-description"
                     className="block text-sm font-medium text-parchment-200"
                   >
-                    Official Description & Context
+                    {vt.descriptionLabel}
                   </label>
                   <textarea
                     id="poll-description"
@@ -644,25 +640,25 @@ export default function AdminVotingPage() {
                     rows={4}
                     value={createDescription}
                     onChange={(e) => setCreateDescription(e.target.value)}
-                    placeholder="Describe the purpose, context, and stakes of this election or decision…"
+                    placeholder={vt.descriptionPlaceholder}
                     className="mt-1.5 block w-full border-2 border-canvas-border bg-canvas-base px-4 py-2.5 text-sm text-parchment-50 placeholder:text-stone-500 focus:border-gold-sovereign focus:outline-none"
                   />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field
-                    label="Informational Start Date/Time (Optional)"
+                    label={vt.startLabel}
                     type="datetime-local"
                     value={createStartAt}
                     onChange={(e) => setCreateStartAt(e.target.value)}
-                    hint="Informational only. Voting opens only when manually triggered."
+                    hint={vt.startHint}
                   />
                   <Field
-                    label="Informational Planned End Date/Time (Optional)"
+                    label={vt.endLabel}
                     type="datetime-local"
                     value={createEndAt}
                     onChange={(e) => setCreateEndAt(e.target.value)}
-                    hint="Informational only. Voting closes only when manually triggered."
+                    hint={vt.endHint}
                   />
                 </div>
 
@@ -672,12 +668,10 @@ export default function AdminVotingPage() {
                     <div>
                       <h3 className="font-display text-base uppercase tracking-wider text-gold-300">
                         {createType === "LEADERSHIP_ELECTION"
-                          ? "Candidates (Minimum 2)"
-                          : "Decision Options (Minimum 2)"}
+                          ? vt.candidatesHeading
+                          : vt.optionsHeading}
                       </h3>
-                      <p className="text-xs text-stone-400">
-                        Options are locked once the voting session is opened.
-                      </p>
+                      <p className="text-xs text-stone-400">{vt.lockedNote}</p>
                     </div>
                     <Button
                       type="button"
@@ -685,7 +679,9 @@ export default function AdminVotingPage() {
                       onClick={addOptionField}
                       disabled={createOptions.length >= 12}
                     >
-                      + Add {createType === "LEADERSHIP_ELECTION" ? "Candidate" : "Option"}
+                      {createType === "LEADERSHIP_ELECTION"
+                        ? vt.addCandidate
+                        : vt.addOption}
                     </Button>
                   </div>
 
@@ -698,8 +694,8 @@ export default function AdminVotingPage() {
                         <div className="flex items-center justify-between">
                           <span className="font-mono text-xs font-bold uppercase tracking-wider text-gold-400">
                             {createType === "LEADERSHIP_ELECTION"
-                              ? `Candidate #${idx + 1}`
-                              : `Option #${idx + 1}`}
+                              ? `${t.votingDetail.candidateNumber}${idx + 1}`
+                              : `${t.votingDetail.optionNumber}${idx + 1}`}
                           </span>
                           {createOptions.length > 2 ? (
                             <button
@@ -707,7 +703,7 @@ export default function AdminVotingPage() {
                               onClick={() => removeOptionField(idx)}
                               className="font-mono text-xs uppercase text-red-300 hover:text-red-200"
                             >
-                              Remove
+                              {vt.remove}
                             </button>
                           ) : null}
                         </div>
@@ -716,8 +712,8 @@ export default function AdminVotingPage() {
                           <Field
                             label={
                               createType === "LEADERSHIP_ELECTION"
-                                ? "Candidate Name"
-                                : "Decision Option Title"
+                                ? vt.candidateName
+                                : vt.decisionOptionTitle
                             }
                             required
                             value={opt.label}
@@ -731,18 +727,18 @@ export default function AdminVotingPage() {
                             }
                           />
                           <Field
-                            label="Short Summary"
+                            label={vt.shortSummary}
                             value={opt.shortDescription}
                             onChange={(e) =>
                               updateOptionField(idx, "shortDescription", e.target.value)
                             }
-                            placeholder="Brief summary line shown on cards"
+                            placeholder={vt.shortSummaryPlaceholder}
                           />
                         </div>
 
                         {createType === "LEADERSHIP_ELECTION" ? (
                           <Field
-                            label="Portrait / Emblem Image URL (Optional)"
+                            label={vt.imageUrlLabel}
                             value={opt.imageUrl}
                             onChange={(e) =>
                               updateOptionField(idx, "imageUrl", e.target.value)
@@ -754,8 +750,8 @@ export default function AdminVotingPage() {
                         <div>
                           <label className="block text-xs font-medium text-parchment-200">
                             {createType === "LEADERSHIP_ELECTION"
-                              ? "Candidate Background & Vision"
-                              : "Policy / Decision Details"}
+                              ? vt.candidateBgLabel
+                              : vt.decisionDetailsLabel}
                           </label>
                           <textarea
                             rows={2}
@@ -763,7 +759,7 @@ export default function AdminVotingPage() {
                             onChange={(e) =>
                               updateOptionField(idx, "details", e.target.value)
                             }
-                            placeholder="Detailed background, vision, or consequences of this choice…"
+                            placeholder={vt.detailsPlaceholder}
                             className="mt-1 block w-full border-2 border-canvas-border bg-canvas-surface px-3 py-2 text-sm text-parchment-50 placeholder:text-stone-500 focus:border-gold-sovereign focus:outline-none"
                           />
                         </div>
@@ -778,10 +774,10 @@ export default function AdminVotingPage() {
                     variant="secondary"
                     onClick={() => setShowCreateForm(false)}
                   >
-                    Cancel
+                    {t.common.cancel}
                   </Button>
                   <Button type="submit" disabled={creating}>
-                    {creating ? "Saving Draft…" : "Save as Draft"}
+                    {creating ? vt.savingDraft : vt.saveAsDraft}
                   </Button>
                 </div>
               </form>
@@ -795,14 +791,18 @@ export default function AdminVotingPage() {
             <Panel variant="hud" brackets className="space-y-6">
               {loadingDetail || !selectedDetail ? (
                 <p className="py-6 text-center font-mono text-xs text-stone-400">
-                  Loading voting session details…
+                  {vt.loadingDetail}
                 </p>
               ) : (
                 <>
                   <div className="flex flex-col gap-4 border-b border-canvas-border pb-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <PollTypeBadge type={selectedDetail.poll.type} />
+                        <PollTypeBadge
+                          type={selectedDetail.poll.type}
+                          electionLabel={t.voting.typeElection}
+                          decisionLabel={t.voting.typeDecision}
+                        />
                         <PollStatusBadge status={selectedDetail.poll.status} />
                         <VisibilityBadge
                           visibility={selectedDetail.poll.resultsVisibility}
@@ -818,12 +818,23 @@ export default function AdminVotingPage() {
                         {selectedDetail.poll.description}
                       </p>
                       <div className="flex flex-wrap gap-x-6 gap-y-1 pt-1 font-mono text-xs text-stone-400">
-                        <span>Total Votes: {selectedDetail.poll.totalVotes}</span>
-                        <span>Opened: {formatDateTime(selectedDetail.poll.openedAt)}</span>
-                        <span>Closed: {formatDateTime(selectedDetail.poll.closedAt)}</span>
                         <span>
-                          Published:{" "}
-                          {formatDateTime(selectedDetail.poll.resultsPublishedAt)}
+                          {vt.stats.totalVotes}: {selectedDetail.poll.totalVotes}
+                        </span>
+                        <span>
+                          {t.votingDetail.opened}:{" "}
+                          {formatDateTime(selectedDetail.poll.openedAt, t.localeCode)}
+                        </span>
+                        <span>
+                          {t.votingDetail.closed}:{" "}
+                          {formatDateTime(selectedDetail.poll.closedAt, t.localeCode)}
+                        </span>
+                        <span>
+                          {vt.stats.published}:{" "}
+                          {formatDateTime(
+                            selectedDetail.poll.resultsPublishedAt,
+                            t.localeCode,
+                          )}
                         </span>
                       </div>
                     </div>
@@ -833,13 +844,13 @@ export default function AdminVotingPage() {
                         href={`/voting/${selectedDetail.poll.id}`}
                         className={buttonStyles({ variant: "secondary" })}
                       >
-                        View Page
+                        {vt.viewPage}
                       </Link>
                       <Button
                         variant="ghost"
                         onClick={() => setSelectedPollId(null)}
                       >
-                        Close Panel
+                        {vt.closePanel}
                       </Button>
                     </div>
                   </div>
@@ -847,11 +858,11 @@ export default function AdminVotingPage() {
                   {/* Lifecycle Action Controls */}
                   <div className="space-y-3 border-b border-canvas-border pb-5">
                     <h3 className="font-mono text-xs uppercase tracking-widest text-gold-400">
-                      Lifecycle & Result Publication Controls
+                      {vt.lifecycleHeading}
                     </h3>
                     {getAvailableActions(selectedDetail.poll).length === 0 ? (
                       <p className="font-mono text-xs text-stone-400">
-                        No lifecycle transitions available for a {selectedDetail.poll.status} session.
+                        {vt.noTransitions}
                       </p>
                     ) : (
                       <div className="flex flex-wrap gap-3">
@@ -876,7 +887,7 @@ export default function AdminVotingPage() {
                         className="mt-4 border-2 border-gold-sovereign bg-canvas-base p-5 shadow-2xl"
                       >
                         <p className="font-mono text-xs uppercase tracking-widest text-gold-400">
-                          Confirm Administrative Action
+                          {vt.confirmActionEyebrow}
                         </p>
                         <h4
                           id="confirm-action-title"
@@ -893,29 +904,29 @@ export default function AdminVotingPage() {
                             disabled={submittingAction}
                           >
                             {submittingAction
-                              ? "Executing…"
-                              : `Confirm: ${pendingAction.label}`}
+                              ? vt.executing
+                              : `${vt.confirmPrefix} ${pendingAction.label}`}
                           </Button>
                           <Button
                             variant="secondary"
                             onClick={() => setPendingAction(null)}
                             disabled={submittingAction}
                           >
-                            Cancel
+                            {t.common.cancel}
                           </Button>
                         </div>
                       </div>
                     ) : null}
                   </div>
 
-                  {/* Aggregate Vote Distribution (Admin Inspection) */}
+                  {/* Aggregate Vote Distribution */}
                   <div className="space-y-3 border-b border-canvas-border pb-5">
                     <div className="flex items-center justify-between">
                       <h3 className="font-mono text-xs uppercase tracking-widest text-gold-400">
-                        Aggregate Vote Tally (Admin View)
+                        {vt.tallyHeading}
                       </h3>
                       <span className="font-mono text-xs text-stone-400">
-                        Individual citizen choices are confidential
+                        {vt.confidentialNote}
                       </span>
                     </div>
 
@@ -937,8 +948,11 @@ export default function AdminVotingPage() {
                               ) : null}
                             </div>
                             <div className="font-mono text-sm font-bold text-gold-300">
-                              {opt.voteCount} vote{opt.voteCount === 1 ? "" : "s"} (
-                              {opt.percentage.toFixed(1)}%)
+                              {opt.voteCount}{" "}
+                              {opt.voteCount === 1
+                                ? t.voting.voteSingular
+                                : t.voting.votePlural}{" "}
+                              ({opt.percentage.toFixed(1)}%)
                             </div>
                           </div>
                           <div className="mt-2 h-2 w-full overflow-hidden bg-canvas-surface">
@@ -955,11 +969,11 @@ export default function AdminVotingPage() {
                   {/* Poll Audit History */}
                   <div className="space-y-3">
                     <h3 className="font-mono text-xs uppercase tracking-widest text-gold-400">
-                      Session Audit Trail
+                      {vt.auditTrailHeading}
                     </h3>
                     {selectedDetail.auditHistory.length === 0 ? (
                       <p className="font-mono text-xs text-stone-400">
-                        No audit events recorded.
+                        {vt.noAuditEvents}
                       </p>
                     ) : (
                       <ul className="divide-y divide-canvas-border border border-canvas-border bg-canvas-base text-xs">
@@ -973,11 +987,11 @@ export default function AdminVotingPage() {
                                 {entry.action}
                               </span>
                               <span className="text-stone-400">
-                                by {entry.actor.username} ({entry.actor.role})
+                                {entry.actor.username} ({entry.actor.role})
                               </span>
                             </div>
                             <span className="font-mono text-stone-400">
-                              {formatDateTime(entry.createdAt)}
+                              {formatDateTime(entry.createdAt, t.localeCode)}
                             </span>
                           </li>
                         ))}
@@ -997,19 +1011,18 @@ export default function AdminVotingPage() {
               id="voting-list-heading"
               className="font-display text-base uppercase tracking-widest text-gold-300"
             >
-              Voting Sessions
+              {vt.sessionsHeading}
             </h2>
 
-            {/* Filter Tabs */}
             <div className="flex flex-wrap gap-1.5">
               {(
                 [
-                  ["ALL", "All"],
-                  ["DRAFT", "Draft"],
-                  ["ACTIVE", "Active"],
-                  ["CLOSED", "Closed"],
-                  ["PUBLISHED", "Published"],
-                  ["ARCHIVED", "Archived"],
+                  ["ALL", vt.filters.ALL],
+                  ["DRAFT", vt.filters.DRAFT],
+                  ["ACTIVE", vt.filters.ACTIVE],
+                  ["CLOSED", vt.filters.CLOSED],
+                  ["PUBLISHED", vt.filters.PUBLISHED],
+                  ["ARCHIVED", vt.filters.ARCHIVED],
                 ] as const
               ).map(([key, label]) => (
                 <button
@@ -1035,29 +1048,29 @@ export default function AdminVotingPage() {
           <div className="mt-4 overflow-x-auto border border-canvas-border bg-canvas-surface">
             {loadingList && !listData ? (
               <div className="p-8 text-center font-mono text-xs text-stone-400">
-                Loading voting sessions…
+                {vt.loadingSessions}
               </div>
             ) : pollsList.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="font-display text-sm uppercase tracking-wider text-gold-300">
-                  No Voting Sessions Found
+                  {vt.noSessionsTitle}
                 </p>
                 <p className="mt-1 font-serif text-sm text-stone-400">
-                  Create a new voting draft above or change the active filter.
+                  {vt.noSessionsBody}
                 </p>
               </div>
             ) : (
               <table className="w-full min-w-[760px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-canvas-border bg-canvas-base/70 font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                    <th className="px-4 py-3">Voting Title</th>
-                    <th className="px-4 py-3">Type</th>
-                    <th className="px-4 py-3">Voting Status</th>
-                    <th className="px-4 py-3">Publication</th>
-                    <th className="px-4 py-3">Total Votes</th>
-                    <th className="px-4 py-3">Created</th>
-                    <th className="px-4 py-3">Updated</th>
-                    <th className="px-4 py-3 text-right">Action</th>
+                    <th className="px-4 py-3">{vt.tableCols.title}</th>
+                    <th className="px-4 py-3">{vt.tableCols.type}</th>
+                    <th className="px-4 py-3">{vt.tableCols.status}</th>
+                    <th className="px-4 py-3">{vt.tableCols.publication}</th>
+                    <th className="px-4 py-3">{vt.tableCols.totalVotes}</th>
+                    <th className="px-4 py-3">{vt.tableCols.created}</th>
+                    <th className="px-4 py-3">{vt.tableCols.updated}</th>
+                    <th className="px-4 py-3 text-right">{vt.tableCols.action}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-canvas-border">
@@ -1075,7 +1088,11 @@ export default function AdminVotingPage() {
                         </p>
                       </td>
                       <td className="px-4 py-3">
-                        <PollTypeBadge type={poll.type} />
+                        <PollTypeBadge
+                          type={poll.type}
+                          electionLabel={t.voting.typeElection}
+                          decisionLabel={t.voting.typeDecision}
+                        />
                       </td>
                       <td className="px-4 py-3">
                         <PollStatusBadge status={poll.status} />
@@ -1087,17 +1104,17 @@ export default function AdminVotingPage() {
                         {poll.totalVotes}
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-stone-400">
-                        {formatDateTime(poll.createdAt)}
+                        {formatDateTime(poll.createdAt, t.localeCode)}
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-stone-400">
-                        {formatDateTime(poll.updatedAt)}
+                        {formatDateTime(poll.updatedAt, t.localeCode)}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Button
                           variant="secondary"
                           onClick={() => setSelectedPollId(poll.id)}
                         >
-                          Manage
+                          {vt.manageBtn}
                         </Button>
                       </td>
                     </tr>
@@ -1110,7 +1127,8 @@ export default function AdminVotingPage() {
           {pagination && pagination.totalPages > 1 ? (
             <div className="mt-4 flex items-center justify-between">
               <p className="font-mono text-xs text-stone-400">
-                Page {pagination.page} of {pagination.totalPages}
+                {t.votingArchive.pageLabel} {pagination.page} {t.votingArchive.ofLabel}{" "}
+                {pagination.totalPages}
               </p>
               <div className="flex gap-2">
                 <Button
@@ -1118,14 +1136,14 @@ export default function AdminVotingPage() {
                   disabled={pagination.page <= 1 || loadingList}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                 >
-                  Previous
+                  {t.common.previous}
                 </Button>
                 <Button
                   variant="secondary"
                   disabled={pagination.page >= pagination.totalPages || loadingList}
                   onClick={() => setPage((p) => p + 1)}
                 >
-                  Next
+                  {t.common.next}
                 </Button>
               </div>
             </div>

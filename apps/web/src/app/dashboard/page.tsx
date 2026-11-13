@@ -8,6 +8,7 @@ import { Emblem } from "@/components/emblem";
 import { Button, buttonStyles } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { cx } from "@/lib/cx";
+import { useLanguage } from "@/lib/i18n";
 
 type Announcement = {
   id: string;
@@ -21,14 +22,19 @@ type Announcement = {
 function PassRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1 border-b border-[#d4c49e] py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-      <dt className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-[#5c4300]">{label}</dt>
-      <dd className="min-w-0 break-all text-[#1f1d1a] [overflow-wrap:anywhere] sm:break-words sm:text-right">{children}</dd>
+      <dt className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-[#5c4300]">
+        {label}
+      </dt>
+      <dd className="min-w-0 break-all text-[#1f1d1a] [overflow-wrap:anywhere] sm:break-words sm:text-right">
+        {children}
+      </dd>
     </div>
   );
 }
 
 export default function DashboardPage() {
   const { status, me, logout } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
 
@@ -53,7 +59,7 @@ export default function DashboardPage() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
         <Emblem className="h-12 w-12 animate-pulse" />
         <p className="font-display text-sm uppercase tracking-widest text-gold-300">
-          Opening the Kingdom Hall…
+          {t.dashboard.loading}
         </p>
       </div>
     );
@@ -69,28 +75,31 @@ export default function DashboardPage() {
           aria-hidden
           className="absolute inset-0 -z-20 h-full w-full object-cover object-[50%_30%]"
         />
-        <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-b from-canvas-base/60 via-canvas-base/80 to-canvas-base" />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-gradient-to-b from-canvas-base/60 via-canvas-base/80 to-canvas-base"
+        />
         <div className="mx-auto max-w-4xl px-4 pb-8 pt-10 sm:pb-12 sm:pt-16">
           <p className="font-mono text-[11px] uppercase tracking-widest text-gold-400">
-            The Kingdom Hall
+            {t.dashboard.eyebrow}
           </p>
           <h1 className="mt-2 font-display text-3xl tracking-wider text-parchment-50 sm:text-5xl">
-            Welcome, {me.citizen?.characterName ?? me.user.username}
+            {t.dashboard.welcome}, {me.citizen?.characterName ?? me.user.username}
           </h1>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/voting" className={buttonStyles()}>
-              Realm Voting
+              {t.dashboard.realmVoting}
             </Link>
             {me.user.role === "ADMIN" || me.user.role === "SUPER_ADMIN" ? (
               <Link href="/admin" className={buttonStyles({ variant: "secondary" })}>
-                Admin Console
+                {t.dashboard.adminConsole}
               </Link>
             ) : null}
             <Link href="/" className={buttonStyles({ variant: "secondary" })}>
-              Return to Realm
+              {t.dashboard.returnToRealm}
             </Link>
             <Button variant="ghost" onClick={handleLogout}>
-              Sign out
+              {t.common.signOut}
             </Button>
           </div>
         </div>
@@ -106,9 +115,9 @@ export default function DashboardPage() {
                   {me.user.role}
                 </p>
                 <h2 id="pass-title" className="mt-1 font-display text-xl text-[#1f1d1a] sm:text-2xl">
-                  Citizen Pass
+                  {t.dashboard.passTitle}
                 </h2>
-                <p className="text-xs text-[#5c4300]">Kingdom of Dragonhold · Aetherial</p>
+                <p className="text-xs text-[#5c4300]">{t.dashboard.passSubtitle}</p>
               </div>
               <div
                 aria-hidden
@@ -119,22 +128,24 @@ export default function DashboardPage() {
             </div>
 
             <dl className="mt-1 text-sm">
-              <PassRow label="Citizen ID">
+              <PassRow label={t.dashboard.citizenId}>
                 <span className="inline-block border border-[#8c6239]/60 bg-[#e6d7b5] px-3 py-1 font-mono text-base font-bold text-[#402d00]">
                   {me.citizen?.citizenCode ?? "—"}
                 </span>
               </PassRow>
-              <PassRow label="Character">
+              <PassRow label={t.dashboard.character}>
                 <span className="font-serif text-base font-bold">
                   {me.citizen?.characterName ?? me.user.username}
                 </span>
               </PassRow>
-              <PassRow label="Username">
+              <PassRow label={t.dashboard.username}>
                 <span className="font-mono text-sm">{me.user.username}</span>
               </PassRow>
               {me.user.email ? (
-                <PassRow label="Email">
-                  <span className="break-all font-mono text-sm [overflow-wrap:anywhere] sm:break-words">{me.user.email}</span>
+                <PassRow label={t.dashboard.email}>
+                  <span className="break-all font-mono text-sm [overflow-wrap:anywhere] sm:break-words">
+                    {me.user.email}
+                  </span>
                 </PassRow>
               ) : null}
             </dl>
@@ -143,17 +154,26 @@ export default function DashboardPage() {
 
         {/* Realm state + chapter */}
         <aside className="min-w-0 space-y-8 lg:col-span-5">
-          <section aria-labelledby="realm-title" className="relative border border-gold-sovereign/30 bg-canvas-surface p-5">
-            <span aria-hidden className="pointer-events-none absolute -left-1 -top-1 h-2.5 w-2.5 border-l-2 border-t-2 border-gold-sovereign" />
-            <span aria-hidden className="pointer-events-none absolute -bottom-1 -right-1 h-2.5 w-2.5 border-b-2 border-r-2 border-gold-sovereign" />
+          <section
+            aria-labelledby="realm-title"
+            className="relative border border-gold-sovereign/30 bg-canvas-surface p-5"
+          >
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -left-1 -top-1 h-2.5 w-2.5 border-l-2 border-t-2 border-gold-sovereign"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -bottom-1 -right-1 h-2.5 w-2.5 border-b-2 border-r-2 border-gold-sovereign"
+            />
             <h2 id="realm-title" className="font-display text-sm uppercase tracking-widest text-gold-300">
-              State of the Realm
+              {t.dashboard.stateTitle}
             </h2>
             <dl className="mt-3 divide-y divide-canvas-border text-sm">
               {[
-                ["Kingdom", "NEWLY ESTABLISHED", "text-emerald-400"],
-                ["High Throne", "VACANT", "text-amber-400"],
-                ["Chronicles", "BLANK", "text-gold-300"],
+                [t.dashboard.stateRows.kingdom, t.dashboard.stateRows.kingdomVal, "text-emerald-400"],
+                [t.dashboard.stateRows.throne, t.dashboard.stateRows.throneVal, "text-amber-400"],
+                [t.dashboard.stateRows.chronicles, t.dashboard.stateRows.chroniclesVal, "text-gold-300"],
               ].map(([k, v, c]) => (
                 <div key={k} className="flex items-center justify-between gap-3 py-2.5">
                   <dt className="text-stone-400">{k}</dt>
@@ -166,10 +186,14 @@ export default function DashboardPage() {
           <section aria-labelledby="chapter-title" className="relative overflow-hidden border border-canvas-border">
             <img src="/images/episode-001.jpg" alt="" aria-hidden className="h-32 w-full object-cover" />
             <div className="p-5">
-              <p className="font-mono text-[11px] uppercase tracking-widest text-gold-400">Current chapter</p>
-              <h2 id="chapter-title" className="mt-1 font-display text-lg text-parchment-50">Episode 001</h2>
+              <p className="font-mono text-[11px] uppercase tracking-widest text-gold-400">
+                {t.dashboard.chapterEyebrow}
+              </p>
+              <h2 id="chapter-title" className="mt-1 font-display text-lg text-parchment-50">
+                {t.dashboard.chapterTitle}
+              </h2>
               <p className="mt-2 font-serif text-sm leading-relaxed text-stone-400">
-                Humanity is rebuilding after the war against the dragons.
+                {t.dashboard.chapterBody}
               </p>
             </div>
           </section>
@@ -178,18 +202,21 @@ export default function DashboardPage() {
 
       {/* Proclamations */}
       <section aria-labelledby="proc-title" className="mx-auto max-w-4xl px-4 pb-14">
-        <h2 id="proc-title" className="border-b border-gold-sovereign/30 pb-3 font-display text-lg uppercase tracking-widest text-gold-300">
-          Proclamations
+        <h2
+          id="proc-title"
+          className="border-b border-gold-sovereign/30 pb-3 font-display text-lg uppercase tracking-widest text-gold-300"
+        >
+          {t.dashboard.proclamationsTitle}
         </h2>
         {announcements === null ? (
-          <p className="mt-6 font-serif text-sm text-stone-500">Reading the notice board…</p>
+          <p className="mt-6 font-serif text-sm text-stone-500">{t.dashboard.readingBoard}</p>
         ) : announcements.length === 0 ? (
           <div className="mt-6 flex items-start gap-4 border border-dashed border-gold-sovereign/30 p-5">
             <Emblem className="h-8 w-8 shrink-0 opacity-60" />
             <div>
-              <p className="font-display text-sm text-gold-300">No proclamations yet.</p>
+              <p className="font-display text-sm text-gold-300">{t.dashboard.noProclamationsTitle}</p>
               <p className="mt-1 font-serif text-sm text-stone-400">
-                When the Creator or the crown speaks, it will be written here.
+                {t.dashboard.noProclamationsBody}
               </p>
             </div>
           </div>
@@ -201,7 +228,7 @@ export default function DashboardPage() {
                   <span>{item.category.replace(/_/g, " ")}</span>
                   {item.publishedAt ? (
                     <time className="text-stone-500" dateTime={item.publishedAt}>
-                      {new Date(item.publishedAt).toLocaleDateString("en-US", {
+                      {new Date(item.publishedAt).toLocaleDateString(t.localeCode, {
                         year: "numeric",
                         month: "long",
                         day: "numeric",

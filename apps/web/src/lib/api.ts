@@ -1,3 +1,5 @@
+import { dictionaries, type Locale } from "./i18n/dictionaries";
+
 export type MeResponse = {
   user: { id: string; username: string; role: string; email?: string };
   citizen: {
@@ -54,27 +56,14 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   return data as T;
 }
 
-const MESSAGES: Record<string, string> = {
-  INVALID_CREDENTIALS: "Email or password is incorrect.",
-  ALREADY_EXISTS: "That username or email is already taken.",
-  RATE_LIMITED: "Too many attempts. Please wait a few minutes and try again.",
-  ACCOUNT_SUSPENDED: "This account has been suspended.",
-  VALIDATION_ERROR: "Please check the highlighted fields.",
-  INVALID_BETA_CODE: "Closed beta access code is incorrect.",
-  REGISTRATION_UNAVAILABLE: "Closed beta registration is currently closed.",
-  REGISTRATION_DISABLED: "Public registration is currently closed.",
-  FORBIDDEN: "You do not have permission to access this resource.",
-  ALREADY_VOTED: "Your vote has already been sealed for this voting session.",
-  VOTING_NOT_ACTIVE: "This voting session is not currently open for voting.",
-  CITIZEN_INELIGIBLE: "Only active citizens of Dragonhold may cast a vote.",
-  INVALID_OPTION: "The selected option is invalid for this voting session.",
-  INVALID_POLL_TRANSITION: "This lifecycle action is not allowed in the current voting state.",
-  BAD_ORIGIN: "Request rejected: unauthorized origin.",
-};
-
-export function errorText(err: unknown): string {
+export function errorText(err: unknown, lang: Locale = "en"): string {
+  const messages = dictionaries[lang].apiErrors;
   if (err instanceof ApiError) {
-    return MESSAGES[err.code] ?? "Something went wrong. Please try again.";
+    return (
+      messages[err.code] ??
+      messages.UNKNOWN ??
+      "Something went wrong. Please try again."
+    );
   }
-  return "Cannot reach the server. Please try again.";
+  return messages.NETWORK ?? "Cannot reach the server. Please try again.";
 }

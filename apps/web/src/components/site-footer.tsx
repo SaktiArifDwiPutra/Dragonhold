@@ -1,11 +1,18 @@
+"use client";
+
 import Link from "next/link";
+import { cx } from "@/lib/cx";
+import { useLanguage } from "@/lib/i18n";
 import { socialLinks } from "@/lib/site-config";
 import { Emblem } from "./emblem";
+import { LanguageSwitcher } from "./language-switcher";
 
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-stone-300 transition-colors hover:text-gold-300";
 
 export function SiteFooter() {
+  const { t } = useLanguage();
+
   return (
     <footer className="border-t border-gold-sovereign/20 bg-canvas-surface">
       <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:grid-cols-3 sm:py-12">
@@ -13,28 +20,36 @@ export function SiteFooter() {
           <div className="flex items-center gap-3">
             <Emblem className="h-8 w-8 shrink-0" />
             <span className="font-display text-lg tracking-[0.18em] text-parchment-50">
-              DRAGONHOLD
+              {t.common.dragonhold}
             </span>
           </div>
           <p className="mt-4 max-w-xs font-serif text-sm leading-relaxed text-stone-400">
-            A kingdom yet to be written, in the world of Aetherial.
+            {t.footer.tagline}
           </p>
+          <div className="mt-4">
+            <LanguageSwitcher />
+          </div>
         </div>
 
         <nav aria-label="Footer">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-gold-400">Explore</h2>
+          <h2 className="font-mono text-xs uppercase tracking-widest text-gold-400">
+            {t.footer.explore}
+          </h2>
           <ul className="mt-2">
-            <li><Link href="/#chapter" className={linkClass}>Episode 001</Link></li>
-            <li><Link href="/#world" className={linkClass}>The World</Link></li>
-            <li><Link href="/#kingdom" className={linkClass}>The Kingdom</Link></li>
-            <li><Link href="/voting" className={linkClass}>Realm Voting</Link></li>
-            <li><Link href="/voting/archive" className={linkClass}>Voting Archive</Link></li>
-            <li><Link href="/login" className={linkClass}>Sign in</Link></li>
+            <li><Link href="/#chapter" className={linkClass}>{t.footer.episode001}</Link></li>
+            <li><Link href="/#world" className={linkClass}>{t.footer.theWorld}</Link></li>
+            <li><Link href="/#kingdom" className={linkClass}>{t.footer.theKingdom}</Link></li>
+            <li><Link href="/voting" className={linkClass}>{t.footer.realmVoting}</Link></li>
+            <li><Link href="/voting/archive" className={linkClass}>{t.footer.votingArchive}</Link></li>
+            <li><Link href="/login" className={linkClass}>{t.common.signIn}</Link></li>
+            <li><Link href="/register" className={cx(linkClass, "text-gold-300")}>{t.common.enterKingdom}</Link></li>
           </ul>
         </nav>
 
         <div>
-          <h2 className="font-mono text-xs uppercase tracking-widest text-gold-400">Follow</h2>
+          <h2 className="font-mono text-xs uppercase tracking-widest text-gold-400">
+            {t.footer.follow}
+          </h2>
           {socialLinks.length > 0 ? (
             <ul className="mt-2">
               {socialLinks.map((link) => (
@@ -46,13 +61,13 @@ export function SiteFooter() {
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm text-stone-500">Our channels will be announced soon.</p>
+            <p className="mt-3 text-sm text-stone-500">{t.footer.channelsSoon}</p>
           )}
         </div>
       </div>
 
       <div className="border-t border-canvas-border px-4 py-4 text-center text-xs text-stone-500">
-        © {new Date().getFullYear()} Dragonhold. Aetherial is a work of fiction.
+        © {new Date().getFullYear()} {t.footer.copyright}
       </div>
     </footer>
   );

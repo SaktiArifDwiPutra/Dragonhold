@@ -444,3 +444,4 @@ Future AI agents working on Dragonhold must adhere strictly to these rules:
 2. **Confirm Neon Production Operations**: Ask the user if they would like to execute the pending migration (`0002_voting_system.sql`) and seed script (`pnpm db:seed`) against their Neon Production database to initialize the Super Admin account and voting tables.
 3. **Verify Super Admin Sign-in**: Assist the user in verifying their login on Vercel once the production database is seeded.
 4. **Follow User Direction**: Proceed with testing or the next roadmap feature based on the user's instructions.
+

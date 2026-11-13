@@ -10,6 +10,7 @@ import { Button, buttonStyles } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
 import { api, errorText } from "@/lib/api";
 import { cx } from "@/lib/cx";
+import { useLanguage } from "@/lib/i18n";
 
 type AdminStats = {
   totalUsers: number;
@@ -67,10 +68,10 @@ type AdminUsersResponse = {
   };
 };
 
-function formatDateTime(iso: string) {
+function formatDateTime(iso: string, locale: string) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleString("en-US", {
+  return date.toLocaleString(locale, {
     year: "numeric",
     month: "short",
     day: "2-digit",
@@ -79,10 +80,10 @@ function formatDateTime(iso: string) {
   });
 }
 
-function formatDateShort(iso: string) {
+function formatDateShort(iso: string, locale: string) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale, {
     year: "numeric",
     month: "short",
     day: "2-digit",
@@ -125,6 +126,7 @@ function StatusBadge({ status }: { status: "ACTIVE" | "SUSPENDED" | "INACTIVE" }
 
 export default function AdminDashboardPage() {
   const { status, me, logout } = useAuth();
+  const { lang, t } = useLanguage();
   const router = useRouter();
 
   const isAdmin =
@@ -137,7 +139,6 @@ export default function AdminDashboardPage() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters & pagination state
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<"" | "SUPER_ADMIN" | "ADMIN" | "CITIZEN">("");
@@ -156,11 +157,11 @@ export default function AdminDashboardPage() {
       const res = await api<AdminOverviewResponse>("/admin/overview");
       setOverview(res);
     } catch (err) {
-      setError(errorText(err));
+      setError(errorText(err, lang));
     } finally {
       setLoadingOverview(false);
     }
-  }, []);
+  }, [lang]);
 
   const fetchUsers = useCallback(async () => {
     setLoadingUsers(true);
@@ -175,11 +176,11 @@ export default function AdminDashboardPage() {
       const res = await api<AdminUsersResponse>(`/admin/users?${params.toString()}`);
       setUsersData(res);
     } catch (err) {
-      setError(errorText(err));
+      setError(errorText(err, lang));
     } finally {
       setLoadingUsers(false);
     }
-  }, [page, appliedSearch, roleFilter, statusFilter]);
+  }, [page, appliedSearch, roleFilter, statusFilter, lang]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -223,7 +224,7 @@ export default function AdminDashboardPage() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
         <Emblem className="h-12 w-12 animate-pulse" />
         <p className="font-display text-sm uppercase tracking-widest text-gold-300">
-          Verifying Sovereign Credentials…
+          {t.admin.verifying}
         </p>
       </div>
     );
@@ -234,20 +235,20 @@ export default function AdminDashboardPage() {
       <div className="mx-auto max-w-lg px-4 py-16">
         <Panel variant="hud" brackets className="space-y-4 text-center">
           <p className="font-mono text-xs uppercase tracking-widest text-seal-crimson">
-            HTTP 403 · Access Restricted
+            {t.admin.restrictedCode}
           </p>
           <h1 className="font-display text-2xl text-parchment-50">
-            Authorized Administrators Only
+            {t.admin.restrictedTitle}
           </h1>
           <p className="font-serif text-sm leading-relaxed text-stone-400">
-            Your account does not hold administrative privileges required to view platform monitoring records.
+            {t.admin.restrictedBody}
           </p>
           <div className="flex flex-col justify-center gap-3 pt-2 sm:flex-row">
             <Link href="/dashboard" className={buttonStyles()}>
-              Kingdom Hall
+              {t.common.kingdomHall}
             </Link>
             <Link href="/" className={buttonStyles({ variant: "secondary" })}>
-              Return to Realm
+              {t.common.returnToRealm}
             </Link>
           </div>
         </Panel>
@@ -269,52 +270,58 @@ export default function AdminDashboardPage() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-[11px] uppercase tracking-widest text-gold-400">
-                  Sovereign Administration
+                  {t.admin.eyebrow}
                 </span>
                 <span className="text-stone-500">·</span>
                 <RoleBadge role={me.user.role as "SUPER_ADMIN" | "ADMIN"} />
               </div>
               <h1 className="mt-2 font-display text-2xl tracking-wider text-parchment-50 sm:text-4xl">
-                Admin Monitoring Console
+                {t.admin.consoleTitle}
               </h1>
               <p className="mt-1 font-mono text-xs text-stone-400">
-                Signed in as <span className="text-parchment-200">{me.user.username}</span>
+                {t.admin.signedInAs}{" "}
+                <span className="text-parchment-200">{me.user.username}</span>
                 {me.citizen?.citizenCode ? ` (${me.citizen.citizenCode})` : ""}
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
               <Link href="/admin/voting" className={buttonStyles()}>
-                Voting Management
+                {t.admin.votingManagement}
               </Link>
               <Button
                 variant="secondary"
                 onClick={handleRefreshAll}
                 disabled={loadingOverview || loadingUsers}
               >
-                {loadingOverview || loadingUsers ? "Refreshing…" : "Refresh"}
+                {loadingOverview || loadingUsers
+                  ? t.common.refreshing
+                  : t.common.refresh}
               </Button>
               <Link href="/dashboard" className={buttonStyles({ variant: "secondary" })}>
-                Kingdom Hall
+                {t.common.kingdomHall}
               </Link>
               <Button variant="ghost" onClick={handleLogout}>
-                Sign out
+                {t.common.signOut}
               </Button>
             </div>
           </div>
 
-          <nav aria-label="Admin sections" className="mt-6 flex flex-wrap gap-2 border-t border-canvas-border pt-4">
+          <nav
+            aria-label="Admin sections"
+            className="mt-6 flex flex-wrap gap-2 border-t border-canvas-border pt-4"
+          >
             <Link
               href="/admin"
               className="border border-gold-sovereign bg-gold-sovereign/15 px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-gold-300"
             >
-              Platform Overview
+              {t.admin.platformOverview}
             </Link>
             <Link
               href="/admin/voting"
               className="border border-canvas-border bg-canvas-base px-4 py-2 font-mono text-xs uppercase tracking-wider text-stone-300 transition-colors hover:border-gold-sovereign/60 hover:text-gold-300"
             >
-              Voting Management
+              {t.admin.votingManagement}
             </Link>
           </nav>
         </div>
@@ -330,17 +337,17 @@ export default function AdminDashboardPage() {
               id="stats-heading"
               className="font-display text-base uppercase tracking-widest text-gold-300"
             >
-              Platform Overview
+              {t.admin.platformOverview}
             </h2>
             <span className="font-mono text-[11px] uppercase tracking-wider text-stone-400">
-              Live Telemetry
+              {t.admin.liveTelemetry}
             </span>
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <Panel variant="hud" brackets className="p-4">
               <p className="font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                Registered Users
+                {t.admin.stats.registeredUsers}
               </p>
               <p className="mt-2 font-display text-3xl text-parchment-50">
                 {stats ? stats.totalUsers : "—"}
@@ -348,59 +355,57 @@ export default function AdminDashboardPage() {
               <p className="mt-1 font-mono text-[11px] text-stone-400">
                 {stats
                   ? `${stats.activeUsers} active · ${stats.suspendedUsers} suspended`
-                  : "Loading…"}
+                  : t.common.loading}
               </p>
             </Panel>
 
             <Panel variant="hud" brackets className="p-4">
               <p className="font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                Enlisted Citizens
+                {t.admin.stats.enlistedCitizens}
               </p>
               <p className="mt-2 font-display text-3xl text-gold-300">
                 {stats ? stats.totalCitizens : "—"}
               </p>
               <p className="mt-1 font-mono text-[11px] text-stone-400">
-                Sealed citizen records
+                {t.admin.stats.sealedRecords}
               </p>
             </Panel>
 
             <Panel variant="hud" brackets className="p-4">
               <p className="font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                Active Sessions
+                {t.admin.stats.activeSessions}
               </p>
               <p className="mt-2 font-display text-3xl text-emerald-400">
                 {stats ? stats.activeSessions : "—"}
               </p>
               <p className="mt-1 font-mono text-[11px] text-stone-400">
-                {stats
-                  ? `${stats.activeSessionUsers} active user${stats.activeSessionUsers === 1 ? "" : "s"}`
-                  : "Loading…"}
+                {stats ? `${stats.activeSessionUsers} active` : t.common.loading}
               </p>
             </Panel>
 
             <Panel variant="hud" brackets className="p-4">
               <p className="font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                Proclamations
+                {t.admin.stats.proclamations}
               </p>
               <p className="mt-2 font-display text-3xl text-parchment-50">
                 {stats ? stats.publishedAnnouncements : "—"}
               </p>
               <p className="mt-1 font-mono text-[11px] text-stone-400">
                 {stats
-                  ? `${stats.publishedAnnouncements} published of ${stats.totalAnnouncements}`
-                  : "Loading…"}
+                  ? `${stats.publishedAnnouncements} / ${stats.totalAnnouncements}`
+                  : t.common.loading}
               </p>
             </Panel>
 
             <Panel variant="hud" brackets className="p-4">
               <p className="font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                Audit Events
+                {t.admin.stats.auditEvents}
               </p>
               <p className="mt-2 font-display text-3xl text-parchment-50">
                 {stats ? stats.totalAuditLogs : "—"}
               </p>
               <p className="mt-1 font-mono text-[11px] text-stone-400">
-                Recorded platform actions
+                {t.admin.stats.recordedActions}
               </p>
             </Panel>
           </div>
@@ -413,38 +418,41 @@ export default function AdminDashboardPage() {
               id="users-heading"
               className="font-display text-base uppercase tracking-widest text-gold-300"
             >
-              Registered Users & Citizens
+              {t.admin.usersHeading}
             </h2>
             <span className="font-mono text-xs text-stone-400">
-              {pagination
-                ? `Showing ${usersList.length} of ${pagination.total} record${pagination.total === 1 ? "" : "s"}`
-                : "Loading records…"}
+              {pagination ? `${usersList.length} / ${pagination.total}` : t.common.loading}
             </span>
           </div>
 
-          {/* Search & Filters */}
           <form
             onSubmit={handleSearchSubmit}
             className="mt-4 grid grid-cols-1 gap-3 border border-canvas-border bg-canvas-surface p-4 sm:grid-cols-12"
           >
             <div className="sm:col-span-5">
-              <label htmlFor="user-search" className="block font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                Search Username / Character / Citizen ID
+              <label
+                htmlFor="user-search"
+                className="block font-mono text-[11px] uppercase tracking-wider text-stone-400"
+              >
+                {t.admin.searchLabel}
               </label>
               <input
                 id="user-search"
                 type="search"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="e.g. ArchDragon or DH-000001"
+                placeholder={t.admin.searchPlaceholder}
                 maxLength={64}
                 className="mt-1 block min-h-11 w-full border-2 border-canvas-border bg-canvas-base px-3 py-2 text-sm text-parchment-50 placeholder:text-stone-500 focus:border-gold-sovereign focus:outline-none"
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label htmlFor="role-filter" className="block font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                Role
+              <label
+                htmlFor="role-filter"
+                className="block font-mono text-[11px] uppercase tracking-wider text-stone-400"
+              >
+                {t.admin.roleLabel}
               </label>
               <select
                 id="role-filter"
@@ -455,7 +463,7 @@ export default function AdminDashboardPage() {
                 }}
                 className="mt-1 block min-h-11 w-full border-2 border-canvas-border bg-canvas-base px-3 py-2 text-sm text-parchment-50 focus:border-gold-sovereign focus:outline-none"
               >
-                <option value="">All Roles</option>
+                <option value="">{t.admin.allRoles}</option>
                 <option value="SUPER_ADMIN">SUPER_ADMIN</option>
                 <option value="ADMIN">ADMIN</option>
                 <option value="CITIZEN">CITIZEN</option>
@@ -463,8 +471,11 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="sm:col-span-2">
-              <label htmlFor="status-filter" className="block font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                Status
+              <label
+                htmlFor="status-filter"
+                className="block font-mono text-[11px] uppercase tracking-wider text-stone-400"
+              >
+                {t.admin.statusLabel}
               </label>
               <select
                 id="status-filter"
@@ -475,7 +486,7 @@ export default function AdminDashboardPage() {
                 }}
                 className="mt-1 block min-h-11 w-full border-2 border-canvas-border bg-canvas-base px-3 py-2 text-sm text-parchment-50 focus:border-gold-sovereign focus:outline-none"
               >
-                <option value="">All Statuses</option>
+                <option value="">{t.admin.allStatuses}</option>
                 <option value="ACTIVE">ACTIVE</option>
                 <option value="SUSPENDED">SUSPENDED</option>
               </select>
@@ -483,40 +494,39 @@ export default function AdminDashboardPage() {
 
             <div className="flex items-end gap-2 sm:col-span-3">
               <Button type="submit" className="flex-1">
-                Filter
+                {t.admin.filterBtn}
               </Button>
               {(appliedSearch || roleFilter || statusFilter) ? (
                 <Button type="button" variant="secondary" onClick={handleResetFilters}>
-                  Reset
+                  {t.admin.resetBtn}
                 </Button>
               ) : null}
             </div>
           </form>
 
-          {/* Users Table / Responsive Cards */}
           <div className="mt-4 overflow-x-auto border border-canvas-border bg-canvas-surface">
             {loadingUsers && !usersData ? (
               <div className="p-8 text-center font-mono text-xs text-stone-400">
-                Loading citizen registry…
+                {t.admin.loadingRegistry}
               </div>
             ) : usersList.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="font-display text-sm uppercase tracking-wider text-gold-300">
-                  No Matching Users Found
+                  {t.admin.noMatchingUsers}
                 </p>
                 <p className="mt-1 font-serif text-sm text-stone-400">
-                  No registered accounts match the current search or filter criteria.
+                  {t.admin.noMatchingUsersBody}
                 </p>
               </div>
             ) : (
               <table className="w-full min-w-[640px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-canvas-border bg-canvas-base/70 font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                    <th className="px-4 py-3">Citizen ID</th>
-                    <th className="px-4 py-3">Username / Character</th>
-                    <th className="px-4 py-3">Role</th>
-                    <th className="px-4 py-3">Account Status</th>
-                    <th className="px-4 py-3">Registered</th>
+                    <th className="px-4 py-3">{t.admin.tableHeaders.citizenId}</th>
+                    <th className="px-4 py-3">{t.admin.tableHeaders.usernameChar}</th>
+                    <th className="px-4 py-3">{t.admin.tableHeaders.role}</th>
+                    <th className="px-4 py-3">{t.admin.tableHeaders.accountStatus}</th>
+                    <th className="px-4 py-3">{t.admin.tableHeaders.registered}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-canvas-border">
@@ -531,7 +541,7 @@ export default function AdminDashboardPage() {
                         </p>
                         {u.citizen?.characterName && u.citizen.characterName !== u.username ? (
                           <p className="font-serif text-xs text-stone-400">
-                            Character: {u.citizen.characterName}
+                            {u.citizen.characterName}
                           </p>
                         ) : null}
                       </td>
@@ -542,7 +552,7 @@ export default function AdminDashboardPage() {
                         <StatusBadge status={u.status} />
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-stone-400">
-                        {formatDateShort(u.createdAt)}
+                        {formatDateShort(u.createdAt, t.localeCode)}
                       </td>
                     </tr>
                   ))}
@@ -551,11 +561,11 @@ export default function AdminDashboardPage() {
             )}
           </div>
 
-          {/* Pagination */}
           {pagination && pagination.totalPages > 1 ? (
             <div className="mt-4 flex items-center justify-between gap-4">
               <p className="font-mono text-xs text-stone-400">
-                Page {pagination.page} of {pagination.totalPages}
+                {t.votingArchive.pageLabel} {pagination.page} {t.votingArchive.ofLabel}{" "}
+                {pagination.totalPages}
               </p>
               <div className="flex items-center gap-2">
                 <Button
@@ -563,14 +573,14 @@ export default function AdminDashboardPage() {
                   disabled={pagination.page <= 1 || loadingUsers}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                 >
-                  Previous
+                  {t.common.previous}
                 </Button>
                 <Button
                   variant="secondary"
                   disabled={pagination.page >= pagination.totalPages || loadingUsers}
                   onClick={() => setPage((p) => p + 1)}
                 >
-                  Next
+                  {t.common.next}
                 </Button>
               </div>
             </div>
@@ -584,25 +594,23 @@ export default function AdminDashboardPage() {
               id="activity-heading"
               className="font-display text-base uppercase tracking-widest text-gold-300"
             >
-              Recent Platform Activity
+              {t.admin.activityHeading}
             </h2>
-            <span className="font-mono text-xs text-stone-400">
-              Audit Log
-            </span>
+            <span className="font-mono text-xs text-stone-400">{t.admin.auditLog}</span>
           </div>
 
           <div className="mt-4">
             {loadingOverview && !overview ? (
               <Panel className="text-center font-mono text-xs text-stone-400">
-                Loading audit records…
+                {t.admin.loadingAudit}
               </Panel>
             ) : recentActivity.length === 0 ? (
               <Panel className="text-center">
                 <p className="font-display text-sm uppercase tracking-wider text-gold-300">
-                  No Recorded Activity Yet
+                  {t.admin.noActivity}
                 </p>
                 <p className="mt-1 font-serif text-sm text-stone-400">
-                  Platform audit events will appear here as administrative and realm actions occur.
+                  {t.admin.noActivityBody}
                 </p>
               </Panel>
             ) : (
@@ -610,10 +618,10 @@ export default function AdminDashboardPage() {
                 <table className="w-full min-w-[600px] border-collapse text-left text-sm">
                   <thead>
                     <tr className="border-b border-canvas-border bg-canvas-base/70 font-mono text-[11px] uppercase tracking-wider text-stone-400">
-                      <th className="px-4 py-3">Action</th>
-                      <th className="px-4 py-3">Actor</th>
-                      <th className="px-4 py-3">Target</th>
-                      <th className="px-4 py-3">Timestamp</th>
+                      <th className="px-4 py-3">{t.admin.tableHeaders.action}</th>
+                      <th className="px-4 py-3">{t.admin.tableHeaders.actor}</th>
+                      <th className="px-4 py-3">{t.admin.tableHeaders.target}</th>
+                      <th className="px-4 py-3">{t.admin.tableHeaders.timestamp}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-canvas-border">
@@ -636,7 +644,7 @@ export default function AdminDashboardPage() {
                             : "—"}
                         </td>
                         <td className="px-4 py-3 font-mono text-xs text-stone-400">
-                          {formatDateTime(item.createdAt)}
+                          {formatDateTime(item.createdAt, t.localeCode)}
                         </td>
                       </tr>
                     ))}

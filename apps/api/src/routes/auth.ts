@@ -1,9 +1,10 @@
 import { citizens, sessions, users } from "@dragonhold/db";
-import { loginSchema } from "@dragonhold/shared";
+import { loginSchema, registerSchema } from "@dragonhold/shared";
 import { hash, verify } from "@node-rs/argon2";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
+import { nextCitizenCode } from "../lib/citizen-code";
 import { HttpError } from "../lib/errors";
 import {
   SESSION_COOKIE,
@@ -20,17 +21,107 @@ import type { AppEnv } from "../types";
 // Hash palsu agar waktu respons login tetap mirip meski email tidak terdaftar
 const DUMMY_HASH = await hash("dragonhold-dummy-password");
 
+function isUniqueViolation(err: unknown): boolean {
+  const e = err as { code?: string; cause?: { code?: string } } | null;
+  return e?.code === "23505" || e?.cause?.code === "23505";
+}
+
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10 });
 
 export const authRoutes = new Hono<AppEnv>();
 
-authRoutes.post("/register", authLimiter, async () => {
-  throw new HttpError(
-    403,
-    "REGISTRATION_DISABLED",
-    "Pendaftaran publik sedang ditutup.",
-  );
+authRoutes.get("/registration-config", (c) => {
+  return c.json({
+    mode: c.get("config").registrationMode ?? "open",
+  });
 });
+
+authRoutes.post(
+  "/register",
+  authLimiter,
+  validate("json", registerSchema),
+  async (c) => {
+    const input = c.req.valid("json");
+    const config = c.get("config");
+
+    if (config.registrationMode === "closed_beta") {
+      // Fail-closed: jika server tidak punya konfigurasi kode beta, tolak pendaftaran
+      if (!config.betaAccessCode || config.betaAccessCode.trim() === "") {
+        throw new HttpError(
+          503,
+          "REGISTRATION_UNAVAILABLE",
+          "Pendaftaran closed beta sedang ditutup.",
+        );
+      }
+      const provided = input.betaCode?.trim();
+      const expected = config.betaAccessCode.trim();
+      if (!provided || provided.toLowerCase() !== expected.toLowerCase()) {
+        throw new HttpError(
+          403,
+          "INVALID_BETA_CODE",
+          "Kode akses closed beta tidak valid.",
+        );
+      }
+    }
+
+    const db = c.get("db");
+    const passwordHash = await hash(input.password); // Argon2id
+
+    let created;
+    try {
+      created = await db.transaction(async (tx) => {
+        const [user] = await tx
+          .insert(users)
+          .values({
+            username: input.username,
+            email: input.email,
+            passwordHash,
+          })
+          .returning({ id: users.id, username: users.username });
+
+        const citizenCode = await nextCitizenCode(tx);
+        const [citizen] = await tx
+          .insert(citizens)
+          .values({
+            userId: user!.id,
+            citizenCode,
+            characterName: input.username,
+          })
+          .returning({
+            id: citizens.id,
+            citizenCode: citizens.citizenCode,
+            characterName: citizens.characterName,
+          });
+
+        return { user: user!, citizen: citizen! };
+      });
+    } catch (err) {
+      if (isUniqueViolation(err)) {
+        throw new HttpError(
+          409,
+          "ALREADY_EXISTS",
+          "Username atau email sudah dipakai.",
+        );
+      }
+      throw err;
+    }
+
+    const token = await createSession(db, created.user.id);
+    setSessionCookie(c, token, config.isProd, config.cookieDomain);
+
+    return c.json(
+      {
+        user: {
+          id: created.user.id,
+          username: created.user.username,
+          role: "CITIZEN",
+        },
+        citizen: created.citizen,
+      },
+      201,
+    );
+  },
+);
 
 authRoutes.post(
   "/login",

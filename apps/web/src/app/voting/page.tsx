@@ -7,6 +7,7 @@ import { Emblem } from "@/components/emblem";
 import { buttonStyles } from "@/components/ui/button";
 import { api, errorText } from "@/lib/api";
 import { cx } from "@/lib/cx";
+import { useLanguage } from "@/lib/i18n";
 
 type PollType = "LEADERSHIP_ELECTION" | "KINGDOM_DECISION";
 type PollStatus = "DRAFT" | "ACTIVE" | "CLOSED" | "CANCELLED";
@@ -56,11 +57,11 @@ type PublicVotingOverviewResponse = {
   cancelledPolls: PublicPollCard[];
 };
 
-function formatDateTime(value: string | null | undefined): string {
+function formatDateTime(value: string | null | undefined, locale: string): string {
   if (!value) return "—";
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleString("en-US", {
+  return d.toLocaleString(locale, {
     year: "numeric",
     month: "short",
     day: "2-digit",
@@ -69,23 +70,32 @@ function formatDateTime(value: string | null | undefined): string {
   });
 }
 
-function TypeBadge({ type }: { type: PollType }) {
+function TypeBadge({
+  type,
+  electionLabel,
+  decisionLabel,
+}: {
+  type: PollType;
+  electionLabel: string;
+  decisionLabel: string;
+}) {
   if (type === "LEADERSHIP_ELECTION") {
     return (
       <span className="inline-flex items-center border border-gold-sovereign/40 bg-gold-sovereign/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-gold-300">
-        Leadership Election
+        {electionLabel}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center border border-sky-500/40 bg-sky-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-sky-300">
-      Kingdom Decision
+      {decisionLabel}
     </span>
   );
 }
 
 export default function VotingPage() {
   const { status: authStatus, me } = useAuth();
+  const { lang, t } = useLanguage();
   const [data, setData] = useState<PublicVotingOverviewResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -101,7 +111,7 @@ export default function VotingPage() {
       })
       .catch((err) => {
         if (!active) return;
-        setError(errorText(err));
+        setError(errorText(err, lang));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -110,7 +120,7 @@ export default function VotingPage() {
     return () => {
       active = false;
     };
-  }, [authStatus]);
+  }, [authStatus, lang]);
 
   const isAdmin =
     me?.user.role === "SUPER_ADMIN" || me?.user.role === "ADMIN";
@@ -126,14 +136,12 @@ export default function VotingPage() {
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="eyebrow">Sovereign Assembly of Dragonhold</p>
+              <p className="eyebrow">{t.voting.eyebrow}</p>
               <h1 className="mt-2 font-display text-3xl uppercase tracking-[0.06em] text-parchment-100 sm:text-5xl">
-                Kingdom Voting &amp; Royal Referendums
+                {t.voting.title}
               </h1>
               <p className="mt-4 text-sm leading-relaxed text-parchment-300 sm:text-base">
-                Participate in Leadership Elections and Kingdom Decisions that
-                shape the governance and realm laws of Dragonhold. Every active
-                citizen holds one sealed vote per assembly.
+                {t.voting.intro}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -141,14 +149,14 @@ export default function VotingPage() {
                 href="/voting/archive"
                 className={cx(buttonStyles({ variant: "secondary", size: "md" }))}
               >
-                Public Voting Archive
+                {t.voting.publicArchiveBtn}
               </Link>
               {isAdmin && (
                 <Link
                   href="/admin/voting"
                   className={cx(buttonStyles({ variant: "primary", size: "md" }))}
                 >
-                  Admin Voting Controls
+                  {t.voting.adminControlsBtn}
                 </Link>
               )}
             </div>
@@ -160,7 +168,7 @@ export default function VotingPage() {
               <div className="flex flex-wrap items-center gap-3 text-xs text-parchment-200">
                 <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
                 <span>
-                  Signed in as{" "}
+                  {t.voting.signedInAs}{" "}
                   <strong className="text-gold-300">
                     {me.citizen?.characterName ?? me.user.username}
                   </strong>
@@ -173,23 +181,29 @@ export default function VotingPage() {
                 <span className="text-parchment-400">•</span>
                 <span className="font-mono text-[11px] uppercase tracking-wider text-emerald-300">
                   {!me.citizen?.status || me.citizen.status === "ACTIVE"
-                    ? "Eligible to Vote"
-                    : "Citizen Pass Inactive"}
+                    ? t.voting.eligible
+                    : t.voting.inactivePass}
                 </span>
               </div>
             ) : (
               <div className="flex flex-wrap items-center justify-between gap-4 w-full">
-                <p className="text-xs text-parchment-300">
-                  Public visitors may inspect active assemblies and official
-                  proclamations. Sign in with your Citizen Pass to cast a sealed
-                  vote.
+                <p className="text-xs text-parchment-300 max-w-2xl">
+                  {t.voting.visitorBanner}
                 </p>
-                <Link
-                  href="/login"
-                  className={cx(buttonStyles({ variant: "secondary", size: "md" }))}
-                >
-                  Sign In to Vote
-                </Link>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href="/register"
+                    className={cx(buttonStyles({ variant: "primary", size: "md" }))}
+                  >
+                    {t.voting.registerToVote}
+                  </Link>
+                  <Link
+                    href="/login"
+                    className={cx(buttonStyles({ variant: "secondary", size: "md" }))}
+                  >
+                    {t.voting.signInToVote}
+                  </Link>
+                </div>
               </div>
             )}
           </div>
@@ -201,7 +215,7 @@ export default function VotingPage() {
           <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 text-center">
             <Emblem className="h-12 w-12 animate-pulse" />
             <p className="font-display text-sm uppercase tracking-widest text-gold-300">
-              Unsealing Royal Chamber Records…
+              {t.voting.loadingRecords}
             </p>
           </div>
         ) : error ? (
@@ -217,30 +231,29 @@ export default function VotingPage() {
             <section aria-labelledby="active-voting-heading">
               <div className="flex flex-col gap-2 border-b border-gold-sovereign/20 pb-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="eyebrow">Open for Citizen Participation</p>
+                  <p className="eyebrow">{t.voting.activeEyebrow}</p>
                   <h2
                     id="active-voting-heading"
                     className="mt-1 font-display text-2xl uppercase tracking-[0.06em] text-parchment-100"
                   >
-                    Active Voting Sessions
+                    {t.voting.activeTitle}
                   </h2>
                 </div>
                 <p className="font-mono text-xs uppercase tracking-wider text-parchment-400">
-                  {data?.activePolls.length ?? 0} Active{" "}
+                  {data?.activePolls.length ?? 0}{" "}
                   {(data?.activePolls.length ?? 0) === 1
-                    ? "Session"
-                    : "Sessions"}
+                    ? t.voting.activeCountSingular
+                    : t.voting.activeCountPlural}
                 </p>
               </div>
 
               {!data || data.activePolls.length === 0 ? (
                 <div className="mt-6 border border-gold-sovereign/20 bg-obsidian-900/50 p-8 text-center">
                   <p className="font-display text-base uppercase tracking-wider text-parchment-200">
-                    No Active Voting Sessions at This Hour
+                    {t.voting.noActiveTitle}
                   </p>
                   <p className="mt-2 text-sm text-parchment-400">
-                    When the High Council opens a Leadership Election or Kingdom
-                    Decision, eligible citizens will cast their ballots here.
+                    {t.voting.noActiveBody}
                   </p>
                 </div>
               ) : (
@@ -253,14 +266,18 @@ export default function VotingPage() {
                       <div>
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex flex-wrap items-center gap-2">
-                            <TypeBadge type={poll.type} />
+                            <TypeBadge
+                              type={poll.type}
+                              electionLabel={t.voting.typeElection}
+                              decisionLabel={t.voting.typeDecision}
+                            />
                             <span className="inline-flex items-center border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-emerald-300">
-                              Active Voting
+                              {t.voting.activeBadge}
                             </span>
                           </div>
                           {poll.hasVoted && (
                             <span className="inline-flex items-center border border-gold-sovereign/60 bg-gold-sovereign/20 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-gold-200">
-                              ✓ Vote Sealed
+                              {t.voting.voteSealedBadge}
                             </span>
                           )}
                         </div>
@@ -278,12 +295,12 @@ export default function VotingPage() {
                           {poll.description}
                         </p>
 
-                        {/* Candidate / Option preview without vote counts */}
                         <div className="mt-5 border-t border-gold-sovereign/15 pt-4">
                           <p className="font-mono text-[10px] uppercase tracking-wider text-gold-400">
+                            {poll.options.length}{" "}
                             {poll.type === "LEADERSHIP_ELECTION"
-                              ? `${poll.options.length} Official Candidates`
-                              : `${poll.options.length} Decision Options`}
+                              ? t.voting.officialCandidates
+                              : t.voting.decisionOptions}
                           </p>
                           <ul className="mt-2.5 space-y-1.5">
                             {poll.options.slice(0, 4).map((opt, idx) => (
@@ -304,7 +321,7 @@ export default function VotingPage() {
                             ))}
                             {poll.options.length > 4 && (
                               <li className="font-mono text-[11px] text-parchment-400">
-                                + {poll.options.length - 4} more…
+                                + {poll.options.length - 4} {t.voting.moreOptions}
                               </li>
                             )}
                           </ul>
@@ -314,13 +331,13 @@ export default function VotingPage() {
                       <div className="mt-6 flex flex-col gap-4 border-t border-gold-sovereign/20 pt-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="text-[11px] text-parchment-400">
                           <p>
-                            Opened:{" "}
+                            {t.voting.openedLabel}:{" "}
                             <span className="text-parchment-200">
-                              {formatDateTime(poll.openedAt)}
+                              {formatDateTime(poll.openedAt, t.localeCode)}
                             </span>
                           </p>
                           <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-parchment-400">
-                            Live tallies remain sealed while voting is active
+                            {t.voting.sealedNotice}
                           </p>
                         </div>
                         <Link
@@ -333,8 +350,8 @@ export default function VotingPage() {
                           )}
                         >
                           {poll.hasVoted
-                            ? "Inspect Ballot"
-                            : "Enter Chamber & Vote"}
+                            ? t.voting.inspectBallot
+                            : t.voting.enterChamber}
                         </Link>
                       </div>
                     </article>
@@ -347,34 +364,33 @@ export default function VotingPage() {
             <section aria-labelledby="published-results-heading">
               <div className="flex flex-col gap-2 border-b border-gold-sovereign/20 pb-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="eyebrow">Royal Proclamations</p>
+                  <p className="eyebrow">{t.voting.publishedEyebrow}</p>
                   <h2
                     id="published-results-heading"
                     className="mt-1 font-display text-2xl uppercase tracking-[0.06em] text-parchment-100"
                   >
-                    Official Result Announcements
+                    {t.voting.publishedTitle}
                   </h2>
                 </div>
                 <Link
                   href="/voting/archive"
                   className="font-mono text-xs uppercase tracking-wider text-gold-300 hover:text-gold-200"
                 >
-                  Browse Full Archive →
+                  {t.voting.browseArchiveLink}
                 </Link>
               </div>
 
               {!data || data.publishedPolls.length === 0 ? (
                 <div className="mt-6 border border-gold-sovereign/20 bg-obsidian-900/40 p-8 text-center">
                   <p className="text-sm text-parchment-300">
-                    No active result announcements are currently pinned to the
-                    proclamation board. You may inspect past decisions in the{" "}
+                    {t.voting.noPublishedBefore}
                     <Link
                       href="/voting/archive"
                       className="text-gold-300 underline underline-offset-4 hover:text-gold-200"
                     >
-                      Public Voting Archive
+                      {t.voting.publicArchiveBtn}
                     </Link>
-                    .
+                    {t.voting.noPublishedAfter}
                   </p>
                 </div>
               ) : (
@@ -387,13 +403,17 @@ export default function VotingPage() {
                       <div className="flex flex-col gap-3 border-b border-gold-sovereign/20 pb-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <TypeBadge type={poll.type} />
+                            <TypeBadge
+                              type={poll.type}
+                              electionLabel={t.voting.typeElection}
+                              decisionLabel={t.voting.typeDecision}
+                            />
                             <span className="inline-flex items-center border border-gold-sovereign/50 bg-gold-sovereign/15 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-gold-300">
-                              Officially Published Result
+                              {t.voting.officiallyPublishedBadge}
                             </span>
                             {poll.hasVoted && (
                               <span className="inline-flex items-center border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-emerald-300">
-                                You Participated
+                                {t.voting.youParticipated}
                               </span>
                             )}
                           </div>
@@ -412,14 +432,14 @@ export default function VotingPage() {
 
                         <div className="shrink-0 text-left sm:text-right">
                           <p className="font-mono text-[10px] uppercase tracking-wider text-parchment-400">
-                            Total Verified Votes
+                            {t.voting.totalVerifiedVotes}
                           </p>
                           <p className="font-display text-3xl text-gold-300">
                             {poll.results?.totalVotes ?? 0}
                           </p>
                           <p className="mt-1 font-mono text-[11px] text-parchment-400">
-                            Announced:{" "}
-                            {formatDateTime(poll.resultsPublishedAt)}
+                            {t.voting.announcedLabel}:{" "}
+                            {formatDateTime(poll.resultsPublishedAt, t.localeCode)}
                           </p>
                         </div>
                       </div>
@@ -443,8 +463,11 @@ export default function VotingPage() {
                                   )}
                                 </div>
                                 <div className="font-mono text-xs text-gold-300">
-                                  <strong>{opt.voteCount}</strong> votes (
-                                  {opt.percentage.toFixed(1)}%)
+                                  <strong>{opt.voteCount}</strong>{" "}
+                                  {opt.voteCount === 1
+                                    ? t.voting.voteSingular
+                                    : t.voting.votePlural}{" "}
+                                  ({opt.percentage.toFixed(1)}%)
                                 </div>
                               </div>
                               <div className="mt-2.5 h-2 w-full overflow-hidden bg-obsidian-900">
@@ -462,13 +485,14 @@ export default function VotingPage() {
 
                       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-gold-sovereign/15 pt-4 text-xs text-parchment-400">
                         <span>
-                          Voting Closed: {formatDateTime(poll.closedAt)}
+                          {t.voting.votingClosedLabel}:{" "}
+                          {formatDateTime(poll.closedAt, t.localeCode)}
                         </span>
                         <Link
                           href={`/voting/${poll.id}`}
                           className="font-mono uppercase tracking-wider text-gold-300 hover:text-gold-200"
                         >
-                          View Full Decree &amp; Breakdown →
+                          {t.voting.viewFullDecree}
                         </Link>
                       </div>
                     </article>
@@ -481,12 +505,12 @@ export default function VotingPage() {
             {data && data.closedPendingPolls.length > 0 && (
               <section aria-labelledby="closed-pending-heading">
                 <div className="border-b border-gold-sovereign/20 pb-4">
-                  <p className="eyebrow">Ballots Sealed</p>
+                  <p className="eyebrow">{t.voting.closedEyebrow}</p>
                   <h2
                     id="closed-pending-heading"
                     className="mt-1 font-display text-2xl uppercase tracking-[0.06em] text-parchment-100"
                   >
-                    Closed Voting — Awaiting Official Proclamation
+                    {t.voting.closedTitle}
                   </h2>
                 </div>
 
@@ -497,9 +521,13 @@ export default function VotingPage() {
                       className="border border-gold-sovereign/25 bg-obsidian-900/75 p-6"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <TypeBadge type={poll.type} />
+                        <TypeBadge
+                          type={poll.type}
+                          electionLabel={t.voting.typeElection}
+                          decisionLabel={t.voting.typeDecision}
+                        />
                         <span className="inline-flex items-center border border-amber-500/40 bg-amber-500/15 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-amber-200">
-                          Closed • Results Sealed
+                          {t.voting.closedBadge}
                         </span>
                       </div>
 
@@ -516,17 +544,19 @@ export default function VotingPage() {
                       </p>
 
                       <div className="mt-4 border border-amber-500/20 bg-obsidian-950/70 px-3.5 py-2.5 text-xs text-parchment-300">
-                        Voting has ended. Official results have not yet been
-                        announced by the High Council.
+                        {t.voting.closedPendingMsg}
                       </div>
 
                       <div className="mt-4 flex items-center justify-between text-xs text-parchment-400">
-                        <span>Closed: {formatDateTime(poll.closedAt)}</span>
+                        <span>
+                          {t.voting.closedLabel}:{" "}
+                          {formatDateTime(poll.closedAt, t.localeCode)}
+                        </span>
                         <Link
                           href={`/voting/${poll.id}`}
                           className="font-mono uppercase tracking-wider text-gold-300 hover:text-gold-200"
                         >
-                          Inspect Session →
+                          {t.voting.inspectSession}
                         </Link>
                       </div>
                     </article>

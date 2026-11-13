@@ -2,6 +2,7 @@
 
 import { useId, useState, type InputHTMLAttributes } from "react";
 import { cx } from "@/lib/cx";
+import { useLanguage } from "@/lib/i18n";
 
 type FieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id"> & {
   label: string;
@@ -10,6 +11,7 @@ type FieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id"> & {
 };
 
 export function Field({ label, error, hint, className, type, ...input }: FieldProps) {
+  const { t } = useLanguage();
   const id = useId();
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
   const isPassword = type === "password";
@@ -40,7 +42,7 @@ export function Field({ label, error, hint, className, type, ...input }: FieldPr
           <button
             type="button"
             onClick={() => setVisible((v) => !v)}
-            aria-label={visible ? "Hide password" : "Show password"}
+            aria-label={visible ? t.auth.field.hidePassword : t.auth.field.showPassword}
             aria-pressed={visible}
             className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-stone-400 hover:text-gold-300"
           >
