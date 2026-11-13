@@ -13,6 +13,7 @@ import {
 import { adminRoutes } from "./routes/admin";
 import { announcementRoutes } from "./routes/announcements";
 import { authRoutes } from "./routes/auth";
+import { votingRoutes } from "./routes/voting";
 import type { AppConfig, AppEnv } from "./types";
 
 export function createApp(db: Database, config: AppConfig) {
@@ -66,6 +67,7 @@ export function createApp(db: Database, config: AppConfig) {
 
   app.route("/auth", authRoutes);
   app.route("/announcements", announcementRoutes);
+  app.route("/voting", votingRoutes);
   app.route("/admin", adminRoutes);
 
   app.notFound((c) =>
@@ -87,6 +89,20 @@ export function createApp(db: Database, config: AppConfig) {
       );
     }
     console.error(err);
+    const pgCode =
+      (err as { code?: string; cause?: { code?: string } } | null)?.code ??
+      (err as { cause?: { code?: string } } | null)?.cause?.code;
+    if (pgCode === "42P01") {
+      return c.json(
+        {
+          error: {
+            code: "DATABASE_MIGRATION_PENDING",
+            message: "Skema database belum lengkap. Jalankan migrasi database terlebih dahulu.",
+          },
+        },
+        503,
+      );
+    }
     return c.json(
       { error: { code: "INTERNAL_ERROR", message: "Terjadi kesalahan pada server." } },
       500,

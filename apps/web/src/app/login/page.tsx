@@ -1,17 +1,8 @@
 import type { Metadata } from "next";
-import { AuthShell } from "@/components/auth/auth-shell";
-import { LoginForm } from "@/components/auth/login-form";
+import { LoginView } from "@/components/auth/auth-views";
 
 export const metadata: Metadata = { title: "Sign in" };
 
 export default function LoginPage() {
-  return (
-    <AuthShell
-      eyebrow="Citizen Verification"
-      title="Sign in"
-      intro="Return to your citizen record in Dragonhold."
-    >
-      <LoginForm />
-    </AuthShell>
-  );
+  return <LoginView />;
 }

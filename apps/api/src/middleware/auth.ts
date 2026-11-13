@@ -25,6 +25,7 @@ export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
       citizenId: citizens.id,
       citizenCode: citizens.citizenCode,
       characterName: citizens.characterName,
+      citizenStatus: citizens.status,
     })
     .from(sessions)
     .innerJoin(users, eq(users.id, sessions.userId))
@@ -51,8 +52,58 @@ export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
     citizenId: row.citizenId,
     citizenCode: row.citizenCode,
     characterName: row.characterName,
+    citizenStatus: row.citizenId ? (row.citizenStatus ?? "ACTIVE") : null,
   };
   c.set("auth", auth);
+  await next();
+});
+
+export const optionalAuth = createMiddleware<AppEnv>(async (c, next) => {
+  const token = getCookie(c, SESSION_COOKIE);
+  if (!token) {
+    await next();
+    return;
+  }
+
+  try {
+    const db = c.get("db");
+    const [row] = await db
+      .select({
+        sessionId: sessions.id,
+        expiresAt: sessions.expiresAt,
+        userId: users.id,
+        username: users.username,
+        email: users.email,
+        role: users.role,
+        userStatus: users.status,
+        citizenId: citizens.id,
+        citizenCode: citizens.citizenCode,
+        characterName: citizens.characterName,
+        citizenStatus: citizens.status,
+      })
+      .from(sessions)
+      .innerJoin(users, eq(users.id, sessions.userId))
+      .leftJoin(citizens, eq(citizens.userId, users.id))
+      .where(eq(sessions.tokenHash, hashToken(token)))
+      .limit(1);
+
+    if (row && row.expiresAt.getTime() > Date.now() && row.userStatus === "ACTIVE") {
+      c.set("auth", {
+        sessionId: row.sessionId,
+        userId: row.userId,
+        username: row.username,
+        email: row.email,
+        role: row.role,
+        citizenId: row.citizenId,
+        citizenCode: row.citizenCode,
+        characterName: row.characterName,
+        citizenStatus: row.citizenId ? (row.citizenStatus ?? "ACTIVE") : null,
+      });
+    }
+  } catch {
+    // Public routes remain accessible even if optional session lookup fails
+  }
+
   await next();
 });
 

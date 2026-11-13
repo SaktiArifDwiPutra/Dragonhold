@@ -77,3 +77,29 @@ test("GET /announcements: returns only published announcements", async () => {
   assert.equal(data.announcements.length, 1);
   assert.equal(data.announcements[0].title, "Episode 001 Teaser");
 });
+
+test("Unhandled Postgres 42P01 (missing table) returns 503 DATABASE_MIGRATION_PENDING", async () => {
+  const mockDb = {
+    select: () => ({
+      from: () => ({
+        where: () => ({
+          orderBy: () => ({
+            limit: async () => {
+              const err = new Error('relation "polls" does not exist') as Error & {
+                code: string;
+              };
+              err.code = "42P01";
+              throw err;
+            },
+          }),
+        }),
+      }),
+    }),
+  } as any;
+
+  const app = createMockApp(mockDb);
+  const res = await app.request("/announcements");
+  assert.equal(res.status, 503);
+  const body = await res.json();
+  assert.equal(body.error.code, "DATABASE_MIGRATION_PENDING");
+});

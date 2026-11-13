@@ -5,23 +5,25 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "./auth/auth-provider";
 import { Emblem } from "./emblem";
+import { LanguageSwitcher } from "./language-switcher";
 import { Button, buttonStyles } from "./ui/button";
 import { cx } from "@/lib/cx";
-
-// Only anchors that exist on the landing page
-const NAV = [
-  { href: "/#chapter", label: "Chapter" },
-  { href: "/#world", label: "World" },
-  { href: "/#kingdom", label: "Kingdom" },
-  { href: "/#announcements", label: "Proclamations" },
-  { href: "/#participate", label: "Enlist" },
-];
+import { useLanguage } from "@/lib/i18n";
 
 export function SiteHeader() {
   const { status, me, logout } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const navItems = [
+    { href: "/#chapter", label: t.header.nav.chapter },
+    { href: "/#world", label: t.header.nav.world },
+    { href: "/#kingdom", label: t.header.nav.kingdom },
+    { href: "/#announcements", label: t.header.nav.proclamations },
+    { href: "/voting", label: t.header.nav.voting },
+  ];
 
   // Close the drawer on navigation and on Escape
   useEffect(() => setOpen(false), [pathname]);
@@ -49,13 +51,13 @@ export function SiteHeader() {
         <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="Dragonhold home">
           <Emblem className="h-7 w-7 shrink-0" />
           <span className="truncate font-display text-[15px] tracking-[0.18em] text-parchment-50 sm:text-lg">
-            DRAGONHOLD
+            {t.common.dragonhold}
           </span>
         </Link>
 
         {/* Desktop navigation */}
-        <nav aria-label="Main" className="hidden items-center gap-6 md:flex">
-          {NAV.map((item) => (
+        <nav aria-label="Main" className="hidden items-center gap-5 md:flex">
+          {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -67,6 +69,8 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <LanguageSwitcher />
+
           {/* Desktop auth actions; on mobile these live in the drawer */}
           <div className="hidden items-center gap-2 md:flex">
             {authed ? (
@@ -76,23 +80,28 @@ export function SiteHeader() {
                     href="/admin"
                     className="font-mono text-xs uppercase tracking-wider text-gold-300 hover:text-gold-400"
                   >
-                    Admin
+                    {t.header.admin}
                   </Link>
                 ) : null}
                 <Link
                   href="/dashboard"
-                  className="max-w-40 truncate text-sm font-medium text-stone-300 hover:text-gold-300"
+                  className="max-w-36 truncate text-sm font-medium text-stone-300 hover:text-gold-300"
                 >
                   {me.citizen?.characterName ?? me.user.username}
                 </Link>
                 <Button variant="secondary" onClick={handleLogout}>
-                  Sign out
+                  {t.common.signOut}
                 </Button>
               </>
             ) : status === "anonymous" ? (
-              <Link href="/login" className={buttonStyles({ variant: "secondary" })}>
-                Sign in
-              </Link>
+              <>
+                <Link href="/login" className={buttonStyles({ variant: "ghost" })}>
+                  {t.common.signIn}
+                </Link>
+                <Link href="/register" className={buttonStyles()}>
+                  {t.common.enterKingdom}
+                </Link>
+              </>
             ) : null}
           </div>
 
@@ -100,7 +109,7 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? t.header.closeMenu : t.header.openMenu}
             aria-expanded={open}
             aria-controls="mobile-menu"
             className="flex h-11 w-11 shrink-0 items-center justify-center border border-gold-sovereign/40 bg-canvas-surface text-gold-300 transition-colors hover:border-gold-sovereign active:bg-canvas-subtle md:hidden"
@@ -128,7 +137,7 @@ export function SiteHeader() {
         >
           <nav aria-label="Mobile" className="px-4 pt-2">
             <ul>
-              {NAV.map((item) => (
+              {navItems.map((item) => (
                 <li key={item.href} className="border-b border-gold-sovereign/15 last:border-b-0">
                   <Link
                     href={item.href}
@@ -151,7 +160,7 @@ export function SiteHeader() {
                     onClick={() => setOpen(false)}
                     className={cx(buttonStyles(), "w-full")}
                   >
-                    Admin Console
+                    {t.common.adminConsole}
                   </Link>
                 ) : null}
                 <Link
@@ -162,20 +171,29 @@ export function SiteHeader() {
                     "w-full",
                   )}
                 >
-                  Kingdom Hall
+                  {t.common.kingdomHall}
                 </Link>
                 <Button variant="secondary" onClick={handleLogout} className="w-full">
-                  Sign out
+                  {t.common.signOut}
                 </Button>
               </>
             ) : (
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className={cx(buttonStyles({ variant: "secondary" }), "w-full")}
-              >
-                Sign in
-              </Link>
+              <>
+                <Link
+                  href="/register"
+                  onClick={() => setOpen(false)}
+                  className={cx(buttonStyles(), "w-full")}
+                >
+                  {t.common.enterKingdom}
+                </Link>
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className={cx(buttonStyles({ variant: "secondary" }), "w-full")}
+                >
+                  {t.common.signIn}
+                </Link>
+              </>
             )}
           </div>
         </div>

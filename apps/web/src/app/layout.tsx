@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { LanguageProvider } from "@/lib/i18n";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -40,11 +41,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${cinzel.variable} ${lora.variable} ${inter.variable}`}
     >
       <body className="flex min-h-screen flex-col font-body bg-canvas-base text-stone-300">
-        <AuthProvider>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

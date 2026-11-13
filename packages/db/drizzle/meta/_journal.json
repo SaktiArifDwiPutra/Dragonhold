@@ -15,6 +15,13 @@
       "when": 1793724124438,
       "tag": "0001_daffy_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794469329863,
+      "tag": "0002_voting_system",
+      "breakpoints": true
     }
   ]
 }

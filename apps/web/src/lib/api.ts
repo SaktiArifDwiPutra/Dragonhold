@@ -1,9 +1,12 @@
+import { dictionaries, type Locale } from "./i18n/dictionaries";
+
 export type MeResponse = {
   user: { id: string; username: string; role: string; email?: string };
   citizen: {
     id: string;
     citizenCode: string | null;
     characterName: string | null;
+    status?: string | null;
   } | null;
 };
 
@@ -53,22 +56,14 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   return data as T;
 }
 
-const MESSAGES: Record<string, string> = {
-  INVALID_CREDENTIALS: "Email or password is incorrect.",
-  ALREADY_EXISTS: "That username or email is already taken.",
-  RATE_LIMITED: "Too many attempts. Please wait a few minutes and try again.",
-  ACCOUNT_SUSPENDED: "This account has been suspended.",
-  VALIDATION_ERROR: "Please check the highlighted fields.",
-  INVALID_BETA_CODE: "Closed beta access code is incorrect.",
-  REGISTRATION_UNAVAILABLE: "Closed beta registration is currently closed.",
-  REGISTRATION_DISABLED: "Public registration is currently closed.",
-  FORBIDDEN: "You do not have permission to access this resource.",
-  BAD_ORIGIN: "Request rejected: unauthorized origin.",
-};
-
-export function errorText(err: unknown): string {
+export function errorText(err: unknown, lang: Locale = "en"): string {
+  const messages = dictionaries[lang].apiErrors;
   if (err instanceof ApiError) {
-    return MESSAGES[err.code] ?? "Something went wrong. Please try again.";
+    return (
+      messages[err.code] ??
+      messages.UNKNOWN ??
+      "Something went wrong. Please try again."
+    );
   }
-  return "Cannot reach the server. Please try again.";
+  return messages.NETWORK ?? "Cannot reach the server. Please try again.";
 }

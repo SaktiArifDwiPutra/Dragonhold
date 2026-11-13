@@ -4,6 +4,8 @@ export type AppConfig = {
   webOrigins: string[];
   isProd: boolean;
   trustedProxyHops: number;
+  registrationMode?: "closed_beta" | "open";
+  betaAccessCode?: string;
   cookieDomain?: string;
   basePath?: string;
 };
@@ -17,6 +19,7 @@ export type AuthContext = {
   citizenId: string | null;
   citizenCode: string | null;
   characterName: string | null;
+  citizenStatus?: "ACTIVE" | "INACTIVE" | "SUSPENDED" | null;
 };
 
 export type AppEnv = {
