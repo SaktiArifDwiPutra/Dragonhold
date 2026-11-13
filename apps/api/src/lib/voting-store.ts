@@ -259,7 +259,7 @@ export function createDrizzleVotingRepository(db: Database): VotingRepository {
         displayOrder: pollOptions.displayOrder,
         voteCount: sql<number>`(
           SELECT count(*)::int FROM poll_votes
-          WHERE poll_votes.option_id = ${pollOptions.id}
+          WHERE poll_votes.option_id = "poll_options"."id"
         )`,
       })
       .from(pollOptions)
@@ -360,7 +360,7 @@ export function createDrizzleVotingRepository(db: Database): VotingRepository {
         displayOrder: pollOptions.displayOrder,
         voteCount: sql<number>`(
           SELECT count(*)::int FROM poll_votes
-          WHERE poll_votes.option_id = ${pollOptions.id}
+          WHERE poll_votes.option_id = "poll_options"."id"
         )`,
       })
       .from(pollOptions)
@@ -522,11 +522,11 @@ export function createDrizzleVotingRepository(db: Database): VotingRepository {
           updatedAt: polls.updatedAt,
           totalVotes: sql<number>`(
             SELECT count(*)::int FROM poll_votes
-            WHERE poll_votes.poll_id = ${polls.id}
+            WHERE poll_votes.poll_id = "polls"."id"
           )`,
           optionCount: sql<number>`(
             SELECT count(*)::int FROM poll_options
-            WHERE poll_options.poll_id = ${polls.id}
+            WHERE poll_options.poll_id = "polls"."id"
           )`,
         })
         .from(polls)

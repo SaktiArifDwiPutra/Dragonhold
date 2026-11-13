@@ -73,10 +73,33 @@ Tambahkan variabel lingkungan berikut di tab **Environment Variables**:
 | `NODE_ENV` | `production` | Mengaktifkan optimasi dan cookie secure |
 | `DATABASE_URL` | *(Connection pooling URL dari Neon)* | Koneksi Postgres dengan SSL |
 | `WEB_ORIGIN` | `https://dragonhold.my.id` | Origin yang diizinkan untuk CORS dan Origin-Guard |
-| `COOKIE_DOMAIN` | `.dragonhold.my.id` | Domain wildcard agar cookie sesi dapat dibaca lintas subdomain |
-| `REGISTRATION_MODE` | `closed_beta` | Mengunci registrasi hanya untuk pemegang kode beta |
-| `BETA_ACCESS_CODE` | `[KODE_RAHASIA_BETA]` | Kode beta yang Anda berikan kepada calon warga |
+| `COOKIE_DOMAIN` | `.dragonhold.my.id` | Domain wildcard agar cookie sesi dapat dibaca lintas subdomain (kosongkan jika single-domain Vercel `/api`) |
+| `GOOGLE_CLIENT_ID` | `[GOOGLE_OAUTH_CLIENT_ID]` | OAuth 2.0 Client ID dari Google Cloud Console (server-side only) |
+| `GOOGLE_CLIENT_SECRET` | `[GOOGLE_OAUTH_CLIENT_SECRET]` | OAuth 2.0 Client Secret (server-side only, JANGAN gunakan prefix `NEXT_PUBLIC_`) |
+| `GOOGLE_REDIRECT_URI` | `https://dragonhold.my.id/api/auth/google/callback` | Exact Redirect URI yang terdaftar di Google Cloud Console |
 | `TRUSTED_PROXY_HOPS`| `1` | Jumlah proxy di depan aplikasi untuk akurasi IP rate limit |
+
+---
+
+## 2B. Google OAuth 2.0 / OpenID Connect Setup (Google Cloud Console)
+
+Dragonhold menggunakan **Google OAuth 2.0 (Authorization Code Flow + OpenID Connect + PKCE)** sebagai satu-satunya metode registrasi warga baru dan login warga reguler. Akun lama pra-OAuth dan `SUPER_ADMIN` (`DH-000001`) tetap dapat masuk dengan kata sandi lalu menautkan akun Google secara aman melalui Kingdom Hall (`/dashboard`).
+
+1. Buka [Google Cloud Console](https://console.cloud.google.com/) -> **APIs & Services** -> **OAuth consent screen**.
+   - Pilih **External** dan lengkapi informasi aplikasi Dragonhold.
+   - Tambahkan non-sensitive scopes wajib: `openid`, `email`, `profile`. Jangan menambahkan scope Google API lain.
+2. Masuk ke **Credentials** -> **Create Credentials** -> **OAuth client ID** -> **Web application**.
+3. Daftarkan **Authorized JavaScript origins** (tanpa trailing slash):
+   - Local Development: `http://localhost:3000`
+   - Production: `https://dragonhold.my.id` *(dan `https://www.dragonhold.my.id` jika dipakai)*
+4. Daftarkan **Authorized redirect URIs** (harus sama persis dengan `GOOGLE_REDIRECT_URI`):
+   - Local Development (via Next.js `/api`): `http://localhost:3000/api/auth/google/callback`
+   - Local Development (jika menjalankan `apps/api` standalone langsung): `http://localhost:4000/auth/google/callback`
+   - Production (Unified Vercel `/api`): `https://dragonhold.my.id/api/auth/google/callback`
+   - Production (jika memisahkan `api.dragonhold.my.id` di Koyeb): `https://api.dragonhold.my.id/auth/google/callback`
+5. Salin **Client ID** dan **Client Secret** ke server-side environment variables (`GOOGLE_CLIENT_ID` dan `GOOGLE_CLIENT_SECRET` di Vercel/Koyeb dan `.env` lokal). Jangan pernah mengekspos `GOOGLE_CLIENT_SECRET` ke kode frontend atau commit ke Git.
+
+> **Catatan Vercel Preview Deployments:** Google Cloud Console menolak wildcard redirect URI seperti `https://*-git-*.vercel.app`. Oleh karena itu, URL Preview dinamis per commit dari Vercel tidak akan diterima otomatis oleh Google OAuth kecuali Anda memetakan domain staging/branch tetap (mis. `https://staging.dragonhold.my.id`) dan mendaftarkan `https://staging.dragonhold.my.id/api/auth/google/callback` secara eksplisit di Google Cloud Console serta mengatur `GOOGLE_REDIRECT_URI` untuk environment Preview tersebut.
 
 ### C. Konfigurasi Custom Domain Backend
 1. Di pengaturan service Koyeb, tambahkan domain: `api.dragonhold.my.id`.

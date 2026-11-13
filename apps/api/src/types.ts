@@ -1,4 +1,5 @@
 import type { Database } from "@dragonhold/db";
+import type { GoogleOAuthClient } from "./lib/google-oauth";
 
 export type AppConfig = {
   webOrigins: string[];
@@ -8,6 +9,10 @@ export type AppConfig = {
   betaAccessCode?: string;
   cookieDomain?: string;
   basePath?: string;
+  googleClientId?: string;
+  googleClientSecret?: string;
+  googleRedirectUri?: string;
+  googleOAuthClient?: GoogleOAuthClient;
 };
 
 export type AuthContext = {
@@ -19,6 +24,7 @@ export type AuthContext = {
   citizenId: string | null;
   citizenCode: string | null;
   characterName: string | null;
+  avatarUrl?: string | null;
   citizenStatus?: "ACTIVE" | "INACTIVE" | "SUSPENDED" | null;
 };
 

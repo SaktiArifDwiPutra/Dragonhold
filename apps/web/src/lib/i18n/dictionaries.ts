@@ -147,7 +147,13 @@ export const en = {
     login: {
       eyebrow: "Citizen Verification",
       title: "Sign in",
-      intro: "Return to your citizen record in Dragonhold.",
+      intro: "Authenticate with Google to return to your citizen record in Dragonhold.",
+      continueWithGoogle: "Continue with Google",
+      redirectingGoogle: "Redirecting to Google…",
+      legacyToggleShow: "Existing pre-Google or Admin account? Sign in with password",
+      legacyToggleHide: "Hide legacy password sign-in",
+      legacyNotice:
+        "Password sign-in is reserved for pre-OAuth accounts and The Creator (Admin) until linked with Google.",
       emailLabel: "Email Address",
       emailPlaceholder: "citizen@dragonhold.realm",
       passwordLabel: "Secret Key (Password)",
@@ -158,10 +164,15 @@ export const en = {
     },
     register: {
       eyebrowOpen: "Citizen Enlistment",
-      eyebrowBeta: "Enlistment · Closed Beta",
+      eyebrowBeta: "Citizen Enlistment",
       title: "Become a Citizen",
       intro:
-        "Take your place in Dragonhold. A permanent Citizen ID will be sealed upon your record.",
+        "Verify your identity with Google, then choose your unique Dragonhold username to seal your Citizen Pass.",
+      continueWithGoogle: "Continue with Google",
+      redirectingGoogle: "Redirecting to Google…",
+      stepOne: "1. Verify identity with your Google account",
+      stepTwo: "2. Choose your unique Dragonhold username & Citizen Pass profile",
+      stepThree: "3. Receive your permanent DH-XXXXXX Citizen ID",
       usernameLabel: "Citizen Name (Username)",
       usernamePlaceholder: "e.g. Aedan_Vance",
       usernameHint:
@@ -182,6 +193,39 @@ export const en = {
       hasAccount: "Already enlisted in the realm?",
       signIn: "Sign in",
     },
+    onboarding: {
+      eyebrow: "Citizen Enlistment · Final Step",
+      title: "Seal Your Citizen Pass",
+      intro:
+        "Your Google identity is verified. Choose your unique Dragonhold username to enter the realm.",
+      loading: "Verifying your Google onboarding session…",
+      expiredTitle: "Onboarding Session Expired",
+      expiredBody:
+        "This verification session has expired or was already completed. Please continue with Google again.",
+      restartGoogle: "Restart with Google",
+      verifiedGoogleLabel: "Verified Google Email",
+      usernameLabel: "Dragonhold Username",
+      usernamePlaceholder: "e.g. aedan_vance",
+      usernameHint: "3–32 characters: lowercase letters, numbers, and underscores (_).",
+      checkingUsername: "Checking availability…",
+      usernameAvailable: "Username is available",
+      usernameTaken: "Username is already taken",
+      usernameInvalid: "Use 3–32 characters (letters, numbers, underscores).",
+      displayNameLabel: "Display Name / Character Name (Optional)",
+      displayNamePlaceholder: "Your name in Dragonhold",
+      avatarUrlLabel: "Avatar Image URL (Optional)",
+      avatarUrlPlaceholder: "https://...",
+      avatarPreviewAlt: "Citizen avatar preview",
+      submitting: "Sealing Citizen Pass…",
+      submit: "Complete Registration & Enter Realm",
+      unlinkedNoticeTitle: "Already have an earlier Dragonhold account?",
+      unlinkedNoticeBody:
+        "This email matches an existing pre-Google Dragonhold account. To protect your account and privileges, verify your existing password to link Google instead of creating a duplicate citizen.",
+      linkExistingToggleShow: "Link this Google identity to an existing account",
+      linkExistingToggleHide: "Back to new citizen registration",
+      linkExistingSubmit: "Verify Password & Link Google",
+      linkExistingSubmitting: "Linking Account…",
+    },
     field: {
       showPassword: "Show password",
       hidePassword: "Hide password",
@@ -194,6 +238,12 @@ export const en = {
       "Use only letters, numbers, and underscores.":
         "Use only letters, numbers, and underscores.",
       "Enter a valid email address.": "Enter a valid email address.",
+      "Display name must be at most 64 characters.":
+        "Display name must be at most 64 characters.",
+      "Avatar URL must be at most 512 characters.":
+        "Avatar URL must be at most 512 characters.",
+      "Enter a valid http:// or https:// image URL.":
+        "Enter a valid http:// or https:// image URL.",
       "Password must be at least 10 characters.":
         "Password must be at least 10 characters.",
       "Password must be at most 128 characters.":
@@ -215,6 +265,11 @@ export const en = {
     character: "Character",
     username: "Username",
     email: "Email",
+    googleAccountLabel: "Google Account",
+    googleConnectedBadge: "Google Connected",
+    googleNotConnected: "Not linked yet",
+    linkGoogleAction: "Link Google Account",
+    googleLinkedBanner: "Your Google account has been securely linked to your Dragonhold record.",
     stateTitle: "State of the Realm",
     stateRows: {
       kingdom: "Kingdom",
@@ -590,6 +645,25 @@ export const en = {
       "This lifecycle action is not allowed in the current voting state.",
     DATABASE_MIGRATION_PENDING:
       "The database schema is not fully migrated yet (missing table). Please run database migrations.",
+    OAUTH_CANCELLED: "Google authentication was cancelled.",
+    INVALID_OAUTH_STATE:
+      "Your Google authentication session expired or is invalid. Please try again.",
+    INVALID_OAUTH_NONCE: "Google identity verification failed (invalid nonce).",
+    INVALID_ID_TOKEN: "Could not verify your Google identity token. Please try again.",
+    EMAIL_NOT_VERIFIED: "Your Google account email must be verified to enter Dragonhold.",
+    OAUTH_NOT_CONFIGURED: "Google OAuth is not configured on the server yet.",
+    OAUTH_UPSTREAM_ERROR: "Could not reach Google authentication servers. Please try again.",
+    ONBOARDING_EXPIRED:
+      "Your onboarding session expired or was already used. Please sign in with Google again.",
+    USERNAME_TAKEN: "That Dragonhold username is already taken.",
+    IDENTITY_ALREADY_LINKED:
+      "This Google account is already linked to another Dragonhold citizen.",
+    USER_ALREADY_LINKED: "Your Dragonhold account is already linked to a Google account.",
+    EMAIL_TAKEN_BY_EXISTING_ACCOUNT:
+      "An earlier Dragonhold account already uses this email. Link it with your existing password instead.",
+    PASSWORD_REGISTRATION_DISABLED:
+      "New citizen registration is only available with Google.",
+    UNAUTHENTICATED: "Please sign in first.",
     BAD_ORIGIN: "Request rejected: unauthorized origin.",
     UNKNOWN: "Something went wrong. Please try again.",
     NETWORK: "Cannot reach the server. Please try again.",
@@ -746,7 +820,13 @@ export const id: Dictionary = {
     login: {
       eyebrow: "Verifikasi Warga",
       title: "Masuk",
-      intro: "Kembali ke catatan Citizen Pass milikmu di Dragonhold.",
+      intro: "Masuk menggunakan akun Google untuk mengakses Citizen Pass milikmu di Dragonhold.",
+      continueWithGoogle: "Lanjutkan dengan Google",
+      redirectingGoogle: "Mengarahkan ke Google…",
+      legacyToggleShow: "Punya akun lama pra-Google atau akun Admin? Masuk dengan kata sandi",
+      legacyToggleHide: "Sembunyikan login kata sandi lama",
+      legacyNotice:
+        "Login kata sandi hanya untuk akun lama dan The Creator (Admin) sebelum menautkan Google.",
       emailLabel: "Alamat Email",
       emailPlaceholder: "warga@dragonhold.realm",
       passwordLabel: "Kata Sandi",
@@ -757,10 +837,15 @@ export const id: Dictionary = {
     },
     register: {
       eyebrowOpen: "Pendaftaran Warga",
-      eyebrowBeta: "Pendaftaran · Closed Beta",
+      eyebrowBeta: "Pendaftaran Warga",
       title: "Daftar Jadi Warga",
       intro:
-        "Ambil tempatmu di Dragonhold. Sebuah Citizen ID permanen akan disegel pada catatanmu.",
+        "Verifikasi identitasmu lewat Google, lalu pilih username Dragonhold unikmu untuk menyegel Citizen Pass.",
+      continueWithGoogle: "Lanjutkan dengan Google",
+      redirectingGoogle: "Mengarahkan ke Google…",
+      stepOne: "1. Verifikasi identitas dengan akun Google milikmu",
+      stepTwo: "2. Pilih username Dragonhold unik dan profil Citizen Pass",
+      stepThree: "3. Terima Citizen ID permanen berformat DH-XXXXXX",
       usernameLabel: "Nama Warga (Username)",
       usernamePlaceholder: "misal: Aedan_Vance",
       usernameHint:
@@ -781,6 +866,39 @@ export const id: Dictionary = {
       hasAccount: "Sudah terdaftar di kerajaan?",
       signIn: "Masuk",
     },
+    onboarding: {
+      eyebrow: "Pendaftaran Warga · Langkah Terakhir",
+      title: "Segel Citizen Pass Milikmu",
+      intro:
+        "Identitas Google milikmu sudah terverifikasi. Pilih username unik Dragonhold untuk memasuki kerajaan.",
+      loading: "Memeriksa sesi onboarding Google…",
+      expiredTitle: "Sesi Onboarding Kedaluwarsa",
+      expiredBody:
+        "Sesi verifikasi ini sudah berakhir atau sudah digunakan. Silakan lanjutkan kembali dengan Google.",
+      restartGoogle: "Ulangi dengan Google",
+      verifiedGoogleLabel: "Email Google Terverifikasi",
+      usernameLabel: "Username Dragonhold",
+      usernamePlaceholder: "misal: aedan_vance",
+      usernameHint: "3–32 karakter: huruf kecil, angka, dan garis bawah (_).",
+      checkingUsername: "Memeriksa ketersediaan…",
+      usernameAvailable: "Username tersedia",
+      usernameTaken: "Username sudah dipakai warga lain",
+      usernameInvalid: "Gunakan 3–32 karakter (huruf, angka, garis bawah).",
+      displayNameLabel: "Nama Tampilan / Karakter (Opsional)",
+      displayNamePlaceholder: "Namamu di Dragonhold",
+      avatarUrlLabel: "URL Gambar Avatar (Opsional)",
+      avatarUrlPlaceholder: "https://...",
+      avatarPreviewAlt: "Pratinjau avatar warga",
+      submitting: "Menyegel Citizen Pass…",
+      submit: "Selesaikan Pendaftaran & Masuki Kerajaan",
+      unlinkedNoticeTitle: "Sudah punya akun Dragonhold sebelumnya?",
+      unlinkedNoticeBody:
+        "Email ini cocok dengan akun Dragonhold lama yang belum tertaut. Demi keamanan akun dan hak aksesmu, verifikasi kata sandi lamamu untuk menautkan Google tanpa membuat akun ganda.",
+      linkExistingToggleShow: "Tautkan akun Google ini ke akun Dragonhold lama",
+      linkExistingToggleHide: "Kembali ke pendaftaran warga baru",
+      linkExistingSubmit: "Verifikasi Kata Sandi & Tautkan Google",
+      linkExistingSubmitting: "Menautkan Akun…",
+    },
     field: {
       showPassword: "Tampilkan kata sandi",
       hidePassword: "Sembunyikan kata sandi",
@@ -793,6 +911,12 @@ export const id: Dictionary = {
       "Use only letters, numbers, and underscores.":
         "Gunakan hanya huruf, angka, dan garis bawah (_).",
       "Enter a valid email address.": "Masukkan alamat email yang valid.",
+      "Display name must be at most 64 characters.":
+        "Nama tampilan maksimal 64 karakter.",
+      "Avatar URL must be at most 512 characters.":
+        "URL avatar maksimal 512 karakter.",
+      "Enter a valid http:// or https:// image URL.":
+        "Masukkan URL gambar http:// atau https:// yang valid.",
       "Password must be at least 10 characters.":
         "Kata sandi minimal 10 karakter.",
       "Password must be at most 128 characters.":
@@ -814,6 +938,11 @@ export const id: Dictionary = {
     character: "Karakter",
     username: "Username",
     email: "Email",
+    googleAccountLabel: "Akun Google",
+    googleConnectedBadge: "Google Terhubung",
+    googleNotConnected: "Belum tertaut",
+    linkGoogleAction: "Tautkan Akun Google",
+    googleLinkedBanner: "Akun Google milikmu berhasil ditautkan ke catatan Dragonhold.",
     stateTitle: "Kondisi Kerajaan",
     stateRows: {
       kingdom: "Kerajaan",
@@ -1191,6 +1320,27 @@ export const id: Dictionary = {
       "Aksi siklus hidup ini tidak diperbolehkan pada status voting saat ini.",
     DATABASE_MIGRATION_PENDING:
       "Skema database belum dimigrasi sepenuhnya (tabel voting belum tersedia). Jalankan migrasi database terlebih dahulu.",
+    OAUTH_CANCELLED: "Autentikasi Google dibatalkan.",
+    INVALID_OAUTH_STATE:
+      "Sesi autentikasi Google sudah kedaluwarsa atau tidak valid. Silakan coba lagi.",
+    INVALID_OAUTH_NONCE: "Verifikasi identitas Google gagal (nonce tidak valid).",
+    INVALID_ID_TOKEN: "Gagal memverifikasi token identitas Google. Silakan coba lagi.",
+    EMAIL_NOT_VERIFIED:
+      "Email akun Google milikmu harus sudah terverifikasi untuk memasuki Dragonhold.",
+    OAUTH_NOT_CONFIGURED: "Google OAuth belum dikonfigurasi di server.",
+    OAUTH_UPSTREAM_ERROR:
+      "Tidak dapat menghubungi server autentikasi Google. Silakan coba lagi.",
+    ONBOARDING_EXPIRED:
+      "Sesi onboarding sudah berakhir atau sudah digunakan. Silakan masuk ulang dengan Google.",
+    USERNAME_TAKEN: "Username Dragonhold tersebut sudah dipakai warga lain.",
+    IDENTITY_ALREADY_LINKED:
+      "Akun Google ini sudah terhubung dengan warga Dragonhold lain.",
+    USER_ALREADY_LINKED: "Akun Dragonhold ini sudah terhubung dengan akun Google.",
+    EMAIL_TAKEN_BY_EXISTING_ACCOUNT:
+      "Sudah ada akun Dragonhold lama dengan email ini. Tautkan memakai kata sandi lamamu.",
+    PASSWORD_REGISTRATION_DISABLED:
+      "Pendaftaran warga baru kini hanya tersedia melalui Google.",
+    UNAUTHENTICATED: "Silakan masuk terlebih dahulu.",
     BAD_ORIGIN: "Permintaan ditolak: origin tidak diizinkan.",
     UNKNOWN: "Terjadi kesalahan. Silakan coba lagi.",
     NETWORK: "Tidak dapat terhubung ke server. Silakan coba lagi.",

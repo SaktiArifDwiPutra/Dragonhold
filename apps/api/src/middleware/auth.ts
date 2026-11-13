@@ -25,6 +25,7 @@ export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
       citizenId: citizens.id,
       citizenCode: citizens.citizenCode,
       characterName: citizens.characterName,
+      avatarUrl: citizens.avatarUrl,
       citizenStatus: citizens.status,
     })
     .from(sessions)
@@ -52,6 +53,7 @@ export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
     citizenId: row.citizenId,
     citizenCode: row.citizenCode,
     characterName: row.characterName,
+    avatarUrl: row.avatarUrl ?? null,
     citizenStatus: row.citizenId ? (row.citizenStatus ?? "ACTIVE") : null,
   };
   c.set("auth", auth);
@@ -79,6 +81,7 @@ export const optionalAuth = createMiddleware<AppEnv>(async (c, next) => {
         citizenId: citizens.id,
         citizenCode: citizens.citizenCode,
         characterName: citizens.characterName,
+        avatarUrl: citizens.avatarUrl,
         citizenStatus: citizens.status,
       })
       .from(sessions)
@@ -97,6 +100,7 @@ export const optionalAuth = createMiddleware<AppEnv>(async (c, next) => {
         citizenId: row.citizenId,
         citizenCode: row.citizenCode,
         characterName: row.characterName,
+        avatarUrl: row.avatarUrl ?? null,
         citizenStatus: row.citizenId ? (row.citizenStatus ?? "ACTIVE") : null,
       });
     }

@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
+import { getGoogleOAuthStartUrl } from "@/components/auth/google-oauth-button";
 import { Emblem } from "@/components/emblem";
+import { Alert } from "@/components/ui/alert";
 import { Button, buttonStyles } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { cx } from "@/lib/cx";
@@ -28,6 +30,31 @@ function PassRow({ label, children }: { label: string; children: React.ReactNode
       <dd className="min-w-0 break-all text-[#1f1d1a] [overflow-wrap:anywhere] sm:break-words sm:text-right">
         {children}
       </dd>
+    </div>
+  );
+}
+
+function DashboardLinkStatusBanner() {
+  const searchParams = useSearchParams();
+  const { t } = useLanguage();
+  const linked = searchParams.get("linked") === "1";
+  const errorCode = searchParams.get("error");
+
+  if (!linked && !errorCode) return null;
+
+  if (linked) {
+    return (
+      <div className="mx-auto max-w-4xl px-4 pt-6">
+        <div className="border border-emerald-500/40 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-200">
+          {t.dashboard.googleLinkedBanner}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 pt-6">
+      <Alert>{t.apiErrors[errorCode!] ?? t.apiErrors.UNKNOWN}</Alert>
     </div>
   );
 }
@@ -105,19 +132,32 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      <Suspense fallback={null}>
+        <DashboardLinkStatusBanner />
+      </Suspense>
+
       <div className="mx-auto grid max-w-4xl gap-8 px-4 py-10 sm:py-14 lg:grid-cols-12">
         {/* Citizen Pass */}
         <section aria-labelledby="pass-title" className="min-w-0 lg:col-span-7">
           <div className="parchment-sheet relative p-5 sm:p-8">
             <div className="flex items-start justify-between gap-3 border-b border-[#c2b28c] pb-4">
-              <div className="min-w-0">
-                <p className="font-mono text-[11px] uppercase tracking-wider text-[#633f19]">
-                  {me.user.role}
-                </p>
-                <h2 id="pass-title" className="mt-1 font-display text-xl text-[#1f1d1a] sm:text-2xl">
-                  {t.dashboard.passTitle}
-                </h2>
-                <p className="text-xs text-[#5c4300]">{t.dashboard.passSubtitle}</p>
+              <div className="flex min-w-0 items-center gap-3">
+                {me.citizen?.avatarUrl ? (
+                  <img
+                    src={me.citizen.avatarUrl}
+                    alt={me.citizen.characterName ?? me.user.username}
+                    className="h-12 w-12 shrink-0 border border-[#8c6239]/60 object-cover"
+                  />
+                ) : null}
+                <div className="min-w-0">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-[#633f19]">
+                    {me.user.role}
+                  </p>
+                  <h2 id="pass-title" className="mt-1 font-display text-xl text-[#1f1d1a] sm:text-2xl">
+                    {t.dashboard.passTitle}
+                  </h2>
+                  <p className="text-xs text-[#5c4300]">{t.dashboard.passSubtitle}</p>
+                </div>
               </div>
               <div
                 aria-hidden
@@ -148,6 +188,30 @@ export default function DashboardPage() {
                   </span>
                 </PassRow>
               ) : null}
+              <PassRow label={t.dashboard.googleAccountLabel}>
+                {me.googleIdentity ? (
+                  <div className="inline-flex flex-wrap items-center justify-end gap-2">
+                    <span className="border border-emerald-800/40 bg-emerald-900/15 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-900">
+                      {t.dashboard.googleConnectedBadge}
+                    </span>
+                    <span className="break-all font-mono text-xs text-[#3b2e13]">
+                      {me.googleIdentity.email}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="inline-flex flex-wrap items-center justify-end gap-2">
+                    <span className="font-mono text-xs text-[#633f19]">
+                      {t.dashboard.googleNotConnected}
+                    </span>
+                    <a
+                      href={getGoogleOAuthStartUrl("link")}
+                      className="inline-block border border-[#8c6239] bg-[#e6d7b5] px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-[#402d00] transition-colors hover:bg-[#d8c499]"
+                    >
+                      {t.dashboard.linkGoogleAction}
+                    </a>
+                  </div>
+                )}
+              </PassRow>
             </dl>
           </div>
         </section>

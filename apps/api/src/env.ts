@@ -20,6 +20,9 @@ export const envSchema = z.object({
   REGISTRATION_MODE: z.enum(["closed_beta", "open"]).default("open"),
   BETA_ACCESS_CODE: z.string().optional(),
   COOKIE_DOMAIN: z.string().optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_REDIRECT_URI: z.string().optional(),
 });
 
 export function getEnv(raw = process.env) {

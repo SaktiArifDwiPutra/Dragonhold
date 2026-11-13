@@ -6,3 +6,4 @@ export * from "./kingdoms";
 export * from "./announcements";
 export * from "./audit-logs";
 export * from "./polls";
+export * from "./auth-identities";

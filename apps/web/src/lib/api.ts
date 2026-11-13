@@ -6,7 +6,14 @@ export type MeResponse = {
     id: string;
     citizenCode: string | null;
     characterName: string | null;
+    avatarUrl?: string | null;
     status?: string | null;
+  } | null;
+  googleIdentity?: {
+    provider: "google";
+    email: string;
+    emailVerified: boolean;
+    linkedAt: string;
   } | null;
 };
 
