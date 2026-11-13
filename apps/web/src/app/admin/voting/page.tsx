@@ -9,6 +9,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button, buttonStyles } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Panel } from "@/components/ui/panel";
+import { OptionImageUpload } from "@/components/voting/option-image-upload";
 import { ApiError, api, errorText } from "@/lib/api";
 import { cx } from "@/lib/cx";
 import { useLanguage } from "@/lib/i18n";
@@ -708,60 +709,66 @@ export default function AdminVotingPage() {
                           ) : null}
                         </div>
 
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <Field
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                          <OptionImageUpload
                             label={
                               createType === "LEADERSHIP_ELECTION"
-                                ? vt.candidateName
-                                : vt.decisionOptionTitle
+                                ? vt.optionImageCandidateLabel
+                                : vt.optionImageLabel
                             }
-                            required
-                            value={opt.label}
-                            onChange={(e) =>
-                              updateOptionField(idx, "label", e.target.value)
-                            }
-                            placeholder={
-                              createType === "LEADERSHIP_ELECTION"
-                                ? "e.g. Lady Seraphina Vance"
-                                : "e.g. Fortify the Northern Citadel"
-                            }
-                          />
-                          <Field
-                            label={vt.shortSummary}
-                            value={opt.shortDescription}
-                            onChange={(e) =>
-                              updateOptionField(idx, "shortDescription", e.target.value)
-                            }
-                            placeholder={vt.shortSummaryPlaceholder}
-                          />
-                        </div>
-
-                        {createType === "LEADERSHIP_ELECTION" ? (
-                          <Field
-                            label={vt.imageUrlLabel}
                             value={opt.imageUrl}
-                            onChange={(e) =>
-                              updateOptionField(idx, "imageUrl", e.target.value)
+                            optionLabel={opt.label}
+                            onChange={(nextUrl) =>
+                              updateOptionField(idx, "imageUrl", nextUrl)
                             }
-                            placeholder="/images/hero-gates.jpg or https://..."
                           />
-                        ) : null}
 
-                        <div>
-                          <label className="block text-xs font-medium text-parchment-200">
-                            {createType === "LEADERSHIP_ELECTION"
-                              ? vt.candidateBgLabel
-                              : vt.decisionDetailsLabel}
-                          </label>
-                          <textarea
-                            rows={2}
-                            value={opt.details}
-                            onChange={(e) =>
-                              updateOptionField(idx, "details", e.target.value)
-                            }
-                            placeholder={vt.detailsPlaceholder}
-                            className="mt-1 block w-full border-2 border-canvas-border bg-canvas-surface px-3 py-2 text-sm text-parchment-50 placeholder:text-stone-500 focus:border-gold-sovereign focus:outline-none"
-                          />
+                          <div className="min-w-0 flex-1 space-y-3">
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <Field
+                                label={
+                                  createType === "LEADERSHIP_ELECTION"
+                                    ? vt.candidateName
+                                    : vt.decisionOptionTitle
+                                }
+                                required
+                                value={opt.label}
+                                onChange={(e) =>
+                                  updateOptionField(idx, "label", e.target.value)
+                                }
+                                placeholder={
+                                  createType === "LEADERSHIP_ELECTION"
+                                    ? "e.g. Lady Seraphina Vance"
+                                    : "e.g. Fortify the Northern Citadel"
+                                }
+                              />
+                              <Field
+                                label={vt.shortSummary}
+                                value={opt.shortDescription}
+                                onChange={(e) =>
+                                  updateOptionField(idx, "shortDescription", e.target.value)
+                                }
+                                placeholder={vt.shortSummaryPlaceholder}
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-medium text-parchment-200">
+                                {createType === "LEADERSHIP_ELECTION"
+                                  ? vt.candidateBgLabel
+                                  : vt.decisionDetailsLabel}
+                              </label>
+                              <textarea
+                                rows={3}
+                                value={opt.details}
+                                onChange={(e) =>
+                                  updateOptionField(idx, "details", e.target.value)
+                                }
+                                placeholder={vt.detailsPlaceholder}
+                                className="mt-1 block w-full border-2 border-canvas-border bg-canvas-surface px-3 py-2 text-base text-parchment-50 placeholder:text-stone-500 focus:border-gold-sovereign focus:outline-none sm:text-sm"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -936,23 +943,34 @@ export default function AdminVotingPage() {
                           key={opt.id}
                           className="border border-canvas-border bg-canvas-base p-3.5"
                         >
-                          <div className="flex flex-wrap items-baseline justify-between gap-2">
-                            <div>
-                              <p className="font-display text-base text-parchment-50">
-                                {opt.label}
-                              </p>
-                              {opt.shortDescription ? (
-                                <p className="text-xs text-stone-400">
-                                  {opt.shortDescription}
-                                </p>
-                              ) : null}
-                            </div>
-                            <div className="font-mono text-sm font-bold text-gold-300">
-                              {opt.voteCount}{" "}
-                              {opt.voteCount === 1
-                                ? t.voting.voteSingular
-                                : t.voting.votePlural}{" "}
-                              ({opt.percentage.toFixed(1)}%)
+                          <div className="flex items-start gap-3">
+                            {opt.imageUrl && (
+                              <img
+                                src={opt.imageUrl}
+                                alt={opt.label}
+                                className="h-12 w-12 shrink-0 border border-gold-sovereign/40 object-cover"
+                              />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                                <div>
+                                  <p className="font-display text-base text-parchment-50">
+                                    {opt.label}
+                                  </p>
+                                  {opt.shortDescription ? (
+                                    <p className="text-xs text-stone-400">
+                                      {opt.shortDescription}
+                                    </p>
+                                  ) : null}
+                                </div>
+                                <div className="font-mono text-sm font-bold text-gold-300">
+                                  {opt.voteCount}{" "}
+                                  {opt.voteCount === 1
+                                    ? t.voting.voteSingular
+                                    : t.voting.votePlural}{" "}
+                                  ({opt.percentage.toFixed(1)}%)
+                                </div>
+                              </div>
                             </div>
                           </div>
                           <div className="mt-2 h-2 w-full overflow-hidden bg-canvas-surface">

@@ -1123,3 +1123,58 @@ test("Vote integrity: duplicate vote rejection, concurrent duplicate submissions
   const detailBody = (await detailAfterConcurrent.json()) as AdminPollDetail;
   assert.equal(detailBody.poll.totalVotes, 1);
 });
+
+test("Voting option images: optional uploaded raster data-URI allowed on both types, SVG rejected", async () => {
+  const { requestAs } = createVotingTestHarness();
+  const validDataUri =
+    "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
+
+  // 1. Kingdom Decision with one uploaded image and one option without any image
+  const createRes = await requestAs(ACTORS.superAdmin!, "/admin/voting", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Confront the Obsidian Wyrm",
+      description:
+        "The council must decide how Dragonhold responds to the dragon roosting near the eastern spire.",
+      type: "KINGDOM_DECISION",
+      options: [
+        {
+          label: "Defeat the dragon",
+          shortDescription: "March the Vanguard at dawn",
+          imageUrl: validDataUri,
+        },
+        {
+          label: "Run away",
+          shortDescription: "Evacuate the outer valley without an emblem image",
+          imageUrl: "",
+        },
+      ],
+    }),
+  });
+  assert.equal(createRes.status, 201);
+  const created = (await createRes.json()) as AdminPollDetail;
+  assert.equal(created.options[0]!.imageUrl, validDataUri);
+  assert.equal(created.options[1]!.imageUrl, null);
+
+  // 2. Reject SVG data URI payload
+  const svgRes = await requestAs(ACTORS.superAdmin!, "/admin/voting", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Unsafe Image Poll",
+      description: "Attempting to store an inline SVG script payload as an option image.",
+      type: "LEADERSHIP_ELECTION",
+      options: [
+        {
+          label: "Candidate One",
+          imageUrl: "data:image/svg+xml;base64,PHN2Zz4=",
+        },
+        {
+          label: "Candidate Two",
+        },
+      ],
+    }),
+  });
+  assert.equal(svgRes.status, 400);
+});

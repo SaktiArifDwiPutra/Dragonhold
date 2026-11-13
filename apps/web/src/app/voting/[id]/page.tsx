@@ -655,15 +655,24 @@ export default function VotingDetailPage() {
               <strong className="text-parchment-100">{poll.title}</strong>{" "}
               {t.votingDetail.modalFor}
             </p>
-            <div className="mt-4 border border-gold-sovereign/40 bg-obsidian-950 p-4">
-              <p className="font-display text-lg uppercase tracking-wider text-gold-300">
-                {selectedOption.label}
-              </p>
-              {selectedOption.shortDescription && (
-                <p className="mt-1 text-xs text-parchment-300">
-                  {selectedOption.shortDescription}
-                </p>
+            <div className="mt-4 flex items-center gap-3 border border-gold-sovereign/40 bg-obsidian-950 p-4">
+              {selectedOption.imageUrl && (
+                <img
+                  src={selectedOption.imageUrl}
+                  alt={selectedOption.label}
+                  className="h-12 w-12 shrink-0 border border-gold-sovereign/40 object-cover"
+                />
               )}
+              <div className="min-w-0">
+                <p className="font-display text-lg uppercase tracking-wider text-gold-300">
+                  {selectedOption.label}
+                </p>
+                {selectedOption.shortDescription && (
+                  <p className="mt-1 text-xs text-parchment-300">
+                    {selectedOption.shortDescription}
+                  </p>
+                )}
+              </div>
             </div>
             <p className="mt-4 text-xs text-amber-200/90">
               {t.votingDetail.modalWarning}

@@ -213,8 +213,15 @@ export const en = {
       usernameInvalid: "Use 3–32 characters (letters, numbers, underscores).",
       displayNameLabel: "Display Name / Character Name (Optional)",
       displayNamePlaceholder: "Your name in Dragonhold",
-      avatarUrlLabel: "Avatar Image URL (Optional)",
-      avatarUrlPlaceholder: "https://...",
+      avatarUploadLabel: "Profile Portrait (Optional)",
+      avatarDropHint: "Drag and drop an image here, or browse from your device",
+      avatarBrowseBtn: "Choose Image",
+      avatarFormatsHint: "PNG, JPG, WEBP, or GIF (auto-cropped & optimized, max 5 MB).",
+      avatarRemove: "Remove",
+      avatarUseGoogle: "Use Google Photo",
+      avatarFileTooLarge: "Image file is too large (max 5 MB).",
+      avatarInvalidType: "Unsupported file type. Please choose a PNG, JPG, WEBP, or GIF image.",
+      avatarProcessingError: "Could not process that image. Please try another file.",
       avatarPreviewAlt: "Citizen avatar preview",
       submitting: "Sealing Citizen Pass…",
       submit: "Complete Registration & Enter Realm",
@@ -240,10 +247,10 @@ export const en = {
       "Enter a valid email address.": "Enter a valid email address.",
       "Display name must be at most 64 characters.":
         "Display name must be at most 64 characters.",
-      "Avatar URL must be at most 512 characters.":
-        "Avatar URL must be at most 512 characters.",
-      "Enter a valid http:// or https:// image URL.":
-        "Enter a valid http:// or https:// image URL.",
+      "Avatar image is too large (max 150 KB encoded).":
+        "Avatar image is too large. Please try a smaller image.",
+      "Upload a valid PNG, JPG, WEBP, or GIF image.":
+        "Upload a valid PNG, JPG, WEBP, or GIF image.",
       "Password must be at least 10 characters.":
         "Password must be at least 10 characters.",
       "Password must be at most 128 characters.":
@@ -539,6 +546,21 @@ export const en = {
       shortSummary: "Short Summary",
       shortSummaryPlaceholder: "Brief summary line shown on cards",
       imageUrlLabel: "Portrait / Emblem Image URL (Optional)",
+      optionImageLabel: "Option Image (Optional)",
+      optionImageCandidateLabel: "Candidate Photo (Optional)",
+      optionImageDropHint: "Drag & drop or tap to upload",
+      optionImageOptionalBadge: "Optional",
+      optionImageBrowseBtn: "Upload Image",
+      optionImageChangeBtn: "Change Image",
+      optionImageRemoveBtn: "Remove",
+      optionImageFormatsHint:
+        "PNG, JPG, WEBP, or GIF (max 5 MB). Leave empty if not needed.",
+      optionImagePreviewAlt: "Voting option preview",
+      optionImageFileTooLarge: "Image file is too large (max 5 MB).",
+      optionImageInvalidType:
+        "Unsupported file type. Please choose PNG, JPG, WEBP, or GIF.",
+      optionImageProcessingError:
+        "Could not process that image. Please try another file.",
       candidateBgLabel: "Candidate Background & Vision",
       decisionDetailsLabel: "Policy / Decision Details",
       detailsPlaceholder:
@@ -886,8 +908,15 @@ export const id: Dictionary = {
       usernameInvalid: "Gunakan 3–32 karakter (huruf, angka, garis bawah).",
       displayNameLabel: "Nama Tampilan / Karakter (Opsional)",
       displayNamePlaceholder: "Namamu di Dragonhold",
-      avatarUrlLabel: "URL Gambar Avatar (Opsional)",
-      avatarUrlPlaceholder: "https://...",
+      avatarUploadLabel: "Foto Profil (Opsional)",
+      avatarDropHint: "Tarik dan lepas gambar ke sini, atau pilih file dari perangkatmu",
+      avatarBrowseBtn: "Pilih Gambar",
+      avatarFormatsHint: "PNG, JPG, WEBP, atau GIF (otomatis dipotong & dioptimalkan, maks 5 MB).",
+      avatarRemove: "Hapus",
+      avatarUseGoogle: "Pakai Foto Google",
+      avatarFileTooLarge: "Ukuran file gambar terlalu besar (maksimal 5 MB).",
+      avatarInvalidType: "Format file tidak didukung. Pilih gambar PNG, JPG, WEBP, atau GIF.",
+      avatarProcessingError: "Gagal memproses gambar tersebut. Coba file lain.",
       avatarPreviewAlt: "Pratinjau avatar warga",
       submitting: "Menyegel Citizen Pass…",
       submit: "Selesaikan Pendaftaran & Masuki Kerajaan",
@@ -913,10 +942,10 @@ export const id: Dictionary = {
       "Enter a valid email address.": "Masukkan alamat email yang valid.",
       "Display name must be at most 64 characters.":
         "Nama tampilan maksimal 64 karakter.",
-      "Avatar URL must be at most 512 characters.":
-        "URL avatar maksimal 512 karakter.",
-      "Enter a valid http:// or https:// image URL.":
-        "Masukkan URL gambar http:// atau https:// yang valid.",
+      "Avatar image is too large (max 150 KB encoded).":
+        "Ukuran gambar avatar terlalu besar. Coba gambar lain.",
+      "Upload a valid PNG, JPG, WEBP, or GIF image.":
+        "Unggah gambar PNG, JPG, WEBP, atau GIF yang valid.",
       "Password must be at least 10 characters.":
         "Kata sandi minimal 10 karakter.",
       "Password must be at most 128 characters.":
@@ -1213,6 +1242,22 @@ export const id: Dictionary = {
       shortSummary: "Ringkasan Singkat",
       shortSummaryPlaceholder: "Ringkasan singkat yang tampil di kartu",
       imageUrlLabel: "URL Gambar / Potret Kandidat (Opsional)",
+      optionImageLabel: "Gambar Opsi (Opsional)",
+      optionImageCandidateLabel: "Foto Kandidat (Opsional)",
+      optionImageDropHint: "Tarik & lepas atau ketuk untuk unggah",
+      optionImageOptionalBadge: "Opsional",
+      optionImageBrowseBtn: "Unggah Gambar",
+      optionImageChangeBtn: "Ganti Gambar",
+      optionImageRemoveBtn: "Hapus",
+      optionImageFormatsHint:
+        "PNG, JPG, WEBP, atau GIF (maks 5 MB). Kosongkan jika tidak perlu.",
+      optionImagePreviewAlt: "Pratinjau gambar opsi voting",
+      optionImageFileTooLarge:
+        "Ukuran file gambar terlalu besar (maksimal 5 MB).",
+      optionImageInvalidType:
+        "Format file tidak didukung. Pilih gambar PNG, JPG, WEBP, atau GIF.",
+      optionImageProcessingError:
+        "Gagal memproses gambar tersebut. Coba file lain.",
       candidateBgLabel: "Latar Belakang & Visi Kandidat",
       decisionDetailsLabel: "Detail Kebijakan / Keputusan",
       detailsPlaceholder:

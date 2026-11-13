@@ -1142,3 +1142,61 @@ test("17: Origin Guard and CORS compatibility on Google onboarding POST", async 
     "true",
   );
 });
+
+test("18: Onboarding accepts safe uploaded raster data-URI avatar and rejects SVG/script payloads", async () => {
+  let nextJwt = "";
+  const { app } = createGoogleTestEnv(() => ({
+    json: { id_token: nextJwt },
+  }));
+
+  const { stateParam, nonce, stateCookie } = await startOAuthFlow(app, "register");
+  nextJwt = createSignedJwt({
+    sub: "google-sub-avatar-upload",
+    email: "lyra@example.com",
+    email_verified: true,
+    nonce,
+  });
+
+  const cbRes = await app.request(
+    `/auth/google/callback?code=avatar-code&state=${encodeURIComponent(stateParam)}`,
+    { headers: { Cookie: `dh_oauth_state=${stateCookie}` } },
+  );
+  assert.equal(cbRes.status, 302);
+  const onboardingCookie = extractCookieValue(getAllSetCookies(cbRes), "dh_onboarding")!;
+  assert.ok(onboardingCookie);
+
+  // Reject SVG data URI (XSS vector)
+  const svgRes = await app.request("/auth/google/onboarding", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "http://localhost:3000",
+      Cookie: `dh_onboarding=${onboardingCookie}`,
+    },
+    body: JSON.stringify({
+      username: "lyra_crest",
+      avatarUrl: "data:image/svg+xml;base64,PHN2Zz4=",
+    }),
+  });
+  assert.equal(svgRes.status, 400);
+  const svgBody = await svgRes.json();
+  assert.equal(svgBody.error.code, "VALIDATION_ERROR");
+
+  // Accept valid WebP data URI
+  const validDataUri = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
+  const okRes = await app.request("/auth/google/onboarding", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "http://localhost:3000",
+      Cookie: `dh_onboarding=${onboardingCookie}`,
+    },
+    body: JSON.stringify({
+      username: "lyra_crest",
+      avatarUrl: validDataUri,
+    }),
+  });
+  assert.equal(okRes.status, 201);
+  const createdBody = await okRes.json();
+  assert.equal(createdBody.citizen.avatarUrl, validDataUri);
+});

@@ -302,12 +302,19 @@ export default function VotingPage() {
                               ? t.voting.officialCandidates
                               : t.voting.decisionOptions}
                           </p>
-                          <ul className="mt-2.5 space-y-1.5">
+                          <ul className="mt-2.5 space-y-2">
                             {poll.options.slice(0, 4).map((opt, idx) => (
                               <li
                                 key={opt.id}
                                 className="flex items-center gap-2.5 text-xs text-parchment-200"
                               >
+                                {opt.imageUrl && (
+                                  <img
+                                    src={opt.imageUrl}
+                                    alt={opt.label}
+                                    className="h-8 w-8 shrink-0 border border-gold-sovereign/40 object-cover"
+                                  />
+                                )}
                                 <span className="font-mono text-[10px] text-gold-400">
                                   {idx + 1}.
                                 </span>
@@ -451,23 +458,34 @@ export default function VotingPage() {
                               key={opt.id}
                               className="border border-gold-sovereign/20 bg-obsidian-950/75 p-4"
                             >
-                              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                                <div>
-                                  <span className="font-display text-base uppercase tracking-wider text-parchment-100">
-                                    {opt.label}
-                                  </span>
-                                  {opt.shortDescription && (
-                                    <p className="mt-0.5 text-xs text-parchment-300">
-                                      {opt.shortDescription}
-                                    </p>
-                                  )}
-                                </div>
-                                <div className="font-mono text-xs text-gold-300">
-                                  <strong>{opt.voteCount}</strong>{" "}
-                                  {opt.voteCount === 1
-                                    ? t.voting.voteSingular
-                                    : t.voting.votePlural}{" "}
-                                  ({opt.percentage.toFixed(1)}%)
+                              <div className="flex items-start gap-3">
+                                {opt.imageUrl && (
+                                  <img
+                                    src={opt.imageUrl}
+                                    alt={opt.label}
+                                    className="h-12 w-12 shrink-0 border border-gold-sovereign/40 object-cover"
+                                  />
+                                )}
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                                    <div>
+                                      <span className="font-display text-base uppercase tracking-wider text-parchment-100">
+                                        {opt.label}
+                                      </span>
+                                      {opt.shortDescription && (
+                                        <p className="mt-0.5 text-xs text-parchment-300">
+                                          {opt.shortDescription}
+                                        </p>
+                                      )}
+                                    </div>
+                                    <div className="font-mono text-xs text-gold-300">
+                                      <strong>{opt.voteCount}</strong>{" "}
+                                      {opt.voteCount === 1
+                                        ? t.voting.voteSingular
+                                        : t.voting.votePlural}{" "}
+                                      ({opt.percentage.toFixed(1)}%)
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                               <div className="mt-2.5 h-2 w-full overflow-hidden bg-obsidian-900">

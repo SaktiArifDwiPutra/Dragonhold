@@ -14,6 +14,7 @@ import { Alert } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Field } from "../ui/field";
 import { useAuth } from "./auth-provider";
+import { AvatarUploadField } from "./avatar-upload-field";
 import { GoogleOAuthButton } from "./google-oauth-button";
 
 type OnboardingSessionInfo = {
@@ -250,7 +251,9 @@ export function OnboardingForm() {
     );
   }
 
-  const avatarPreviewValid = /^https?:\/\/[^\s]+$/i.test(values.avatarUrl.trim());
+  const avatarPreviewValid =
+    /^https?:\/\/[^\s]+$/i.test(values.avatarUrl.trim()) ||
+    /^data:image\/(?:png|jpeg|jpg|webp|gif);base64,/i.test(values.avatarUrl.trim());
 
   return (
     <div className="space-y-6">
@@ -326,13 +329,12 @@ export function OnboardingForm() {
             error={errors.displayName}
           />
 
-          <Field
-            label={t.auth.onboarding.avatarUrlLabel}
-            name="avatarUrl"
-            type="url"
-            placeholder={t.auth.onboarding.avatarUrlPlaceholder}
+          <AvatarUploadField
             value={values.avatarUrl}
-            onChange={updateField("avatarUrl")}
+            googleDefaultUrl={sessionState.data.suggestedAvatarUrl}
+            onChange={(nextUrl) =>
+              setValues((v) => ({ ...v, avatarUrl: nextUrl }))
+            }
             error={errors.avatarUrl}
           />
 

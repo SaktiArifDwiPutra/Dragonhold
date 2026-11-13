@@ -80,7 +80,7 @@ export const pollOptions = pgTable(
       .notNull()
       .default(""),
     details: text("details").notNull().default(""),
-    imageUrl: varchar("image_url", { length: 512 }),
+    imageUrl: text("image_url"),
     displayOrder: integer("display_order").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

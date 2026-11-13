@@ -1,4 +1,10 @@
 import { z } from "zod";
+import {
+  isSafeRasterDataUri,
+  MAX_IMAGE_DATA_URI_LENGTH,
+  MAX_IMAGE_URL_LENGTH,
+  SAFE_HTTP_IMAGE_URL_RE,
+} from "./image";
 
 export const usernameSchema = z
   .string()
@@ -46,11 +52,12 @@ export const displayNameSchema = z
 export const avatarUrlSchema = z
   .string()
   .trim()
-  .max(512, "Avatar URL must be at most 512 characters.")
-  .refine(
-    (v) => v === "" || /^https?:\/\/[^\s]+$/i.test(v),
-    "Enter a valid http:// or https:// image URL.",
-  )
+  .max(MAX_IMAGE_DATA_URI_LENGTH, "Avatar image is too large (max 150 KB encoded).")
+  .refine((v) => {
+    if (v === "") return true;
+    if (SAFE_HTTP_IMAGE_URL_RE.test(v)) return v.length <= MAX_IMAGE_URL_LENGTH;
+    return isSafeRasterDataUri(v);
+  }, "Upload a valid PNG, JPG, WEBP, or GIF image.")
   .optional()
   .transform((v) => (v && v.length > 0 ? v : undefined));
 

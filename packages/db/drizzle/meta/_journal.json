@@ -29,6 +29,20 @@
       "when": 1794551407755,
       "tag": "0003_google_oauth",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794562787480,
+      "tag": "0004_avatar_text",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794563374857,
+      "tag": "0005_poll_option_image_text",
+      "breakpoints": true
     }
   ]
 }

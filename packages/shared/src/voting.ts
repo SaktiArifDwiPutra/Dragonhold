@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  isSafeRasterDataUri,
+  MAX_IMAGE_DATA_URI_LENGTH,
+  MAX_IMAGE_URL_LENGTH,
+} from "./image";
 
 export const pollTypeSchema = z.enum([
   "LEADERSHIP_ELECTION",
@@ -21,13 +26,15 @@ export const pollResultsVisibilitySchema = z.enum([
 export const imageUrlSchema = z
   .string()
   .trim()
-  .max(512, "Image URL must be at most 512 characters.")
+  .max(MAX_IMAGE_DATA_URI_LENGTH, "Option image is too large (max 150 KB encoded).")
   .optional()
   .nullable()
   .transform((val) => (val && val.length > 0 ? val : null))
   .refine(
     (val) => {
       if (!val) return true;
+      if (isSafeRasterDataUri(val)) return true;
+      if (val.length > MAX_IMAGE_URL_LENGTH) return false;
       if (val.startsWith("/")) return !val.startsWith("//");
       try {
         const u = new URL(val);
@@ -36,7 +43,10 @@ export const imageUrlSchema = z
         return false;
       }
     },
-    { message: "Image URL must be a valid http(s) URL or relative path starting with /." },
+    {
+      message:
+        "Image must be a valid PNG, JPG, WEBP, GIF upload, http(s) URL, or relative path starting with /.",
+    },
   );
 
 export const pollOptionInputSchema = z.object({

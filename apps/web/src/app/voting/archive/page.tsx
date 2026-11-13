@@ -301,23 +301,34 @@ export default function VotingArchivePage() {
                           key={opt.id}
                           className="border border-gold-sovereign/20 bg-obsidian-950/75 p-4"
                         >
-                          <div className="flex items-baseline justify-between gap-2">
-                            <span className="font-display text-sm uppercase tracking-wider text-parchment-100">
-                              {idx + 1}. {opt.label}
-                            </span>
-                            <span className="font-mono text-xs text-gold-300">
-                              {opt.voteCount}{" "}
-                              {opt.voteCount === 1
-                                ? t.voting.voteSingular
-                                : t.voting.votePlural}{" "}
-                              ({opt.percentage.toFixed(1)}%)
-                            </span>
+                          <div className="flex items-start gap-3">
+                            {opt.imageUrl && (
+                              <img
+                                src={opt.imageUrl}
+                                alt={opt.label}
+                                className="h-12 w-12 shrink-0 border border-gold-sovereign/40 object-cover"
+                              />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-baseline justify-between gap-2">
+                                <span className="font-display text-sm uppercase tracking-wider text-parchment-100">
+                                  {idx + 1}. {opt.label}
+                                </span>
+                                <span className="shrink-0 font-mono text-xs text-gold-300">
+                                  {opt.voteCount}{" "}
+                                  {opt.voteCount === 1
+                                    ? t.voting.voteSingular
+                                    : t.voting.votePlural}{" "}
+                                  ({opt.percentage.toFixed(1)}%)
+                                </span>
+                              </div>
+                              {opt.shortDescription && (
+                                <p className="mt-1 text-xs text-parchment-400">
+                                  {opt.shortDescription}
+                                </p>
+                              )}
+                            </div>
                           </div>
-                          {opt.shortDescription && (
-                            <p className="mt-1 text-xs text-parchment-400">
-                              {opt.shortDescription}
-                            </p>
-                          )}
                           <div className="mt-2.5 h-2 w-full overflow-hidden bg-obsidian-900">
                             <div
                               className="h-full bg-gradient-to-r from-gold-500 to-gold-300"

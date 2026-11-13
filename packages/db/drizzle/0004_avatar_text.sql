@@ -1,0 +1,1 @@
+ALTER TABLE "citizens" ALTER COLUMN "avatar_url" SET DATA TYPE text;

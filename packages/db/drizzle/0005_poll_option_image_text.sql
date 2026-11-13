@@ -1,0 +1,1 @@
+ALTER TABLE "poll_options" ALTER COLUMN "image_url" SET DATA TYPE text;
